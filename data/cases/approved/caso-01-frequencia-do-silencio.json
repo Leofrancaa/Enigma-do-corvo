@@ -1,0 +1,81 @@
+{
+  "slug": "a-frequencia-do-silencio",
+  "title": "A Frequência do Silêncio",
+  "difficulty": "facil",
+  "max_turns": 22,
+  "max_errors": 4,
+  "recommended_players_min": 2,
+  "recommended_players_max": 6,
+  "narrative_intro": "Nova Kyros nunca dorme — mas Ryo Tanaka sim. Para sempre.\n\nO engenheiro de som foi encontrado morto no Beco das Cifras às 05h12 de uma terça-feira chuvosa. O laudo inicial indicou falência cardíaca súbita. Caso encerrado em 40 minutos. Mas o detetive de plantão percebeu algo que não estava no relatório: os fones de ouvido de Ryo ainda estavam conectados, e o espectro de frequência num terminal próximo mostrava um pulso anômalo em 7Hz — uma frequência que a ciência conhece há décadas como potencialmente letal em exposição prolongada.\n\nRyo não era descuidado. Era obcecado com precisão acústica. Nas semanas anteriores, ele trabalhava até tarde analisando transmissões saídas da Torre de Dados — a espinha dorsal do sinal de rádio de Nova Kyros. Uma semana antes de morrer, deixou uma mensagem para um amigo: 'Descobri algo que vai mudar tudo. Mas preciso ter certeza antes de falar.'\n\nEle não teve tempo de ter certeza.\n\nAgora cabe a vocês: o que Ryo descobriu, e quem não queria que ele contasse?",
+  "solution_who": "Kreuz Vann",
+  "solution_where_slug": "torre-dados",
+  "solution_how": "Frequência sônica letal de 7Hz emitida remotamente pelo fone de ouvido hackeado da vítima",
+  "solution_why": "Ryo descobriu que Kreuz transmitia propaganda subliminar paga por políticos corruptos através das torres de rádio, e planejava expor o esquema à imprensa",
+  "solution_explanation": "Kreuz Vann, Diretor de Operações da Torre de Dados, montou ao longo de anos um esquema criminoso: embutia sinais subliminares em 7Hz nas transmissões de rádio de Nova Kyros, vendendo esse serviço a políticos corruptos. Ryo Tanaka detectou a anomalia enquanto analisava espectros no Beco das Cifras e planejava ir à imprensa. Kreuz acessou remotamente os fones de ouvido de Ryo — adulterados com um módulo transmissor — e ativou o sinal letal. O acesso ficou registrado nos logs da Torre de Dados como TowerCorp/Admin/KVann, e a empresa fantasma nos arquivos da Catedral do Código (RAZUK Enterprises) era um anagrama perfeito de KREUZ.",
+  "clues": [
+    {
+      "location_slug": "beco-cifras",
+      "type": "evidencia",
+      "display_content": "Terminal portátil de Ryo, ainda ligado no beco. O monitor exibe um espectro de frequência com anomalia marcada em vermelho: 7Hz pulsando a cada 3 segundos. Um post-it colado na tela: 'Quem opera a Torre de Dados às 03h? Verificar licença empresa RAZUK na Catedral do Código.'",
+      "decoded_hint": null,
+      "reveals_field": "context",
+      "order": 1
+    },
+    {
+      "location_slug": "torre-dados",
+      "type": "cifra",
+      "display_content": "Placa no elevador de acesso restrito da Torre: 'Autorizado: OVIYD ZERR — DIRETOR'. Cada letra do nome está 4 posições à frente no alfabeto. Volte 4 posições para revelar quem é o Diretor.",
+      "decoded_hint": "Deslocamento César -4: O→K, V→R, I→E, Y→U, D→Z = KREUZ. Z→V, E→A, R→N, R→N = VANN. Nome: KREUZ VANN.",
+      "reveals_field": "who",
+      "order": 1
+    },
+    {
+      "location_slug": "torre-dados",
+      "type": "depoimento",
+      "display_content": "Log de mensagens interceptado no servidor interno: 'Diretor — o Conselheiro Aldris confirmou mais 2 milhões para o próximo ciclo eleitoral. O sinal estará ativo nas noites de quarta. Ninguém perceberá... a não ser alguém com ouvido treinado e muito tempo livre. — Op. Y'",
+      "decoded_hint": null,
+      "reveals_field": "why",
+      "order": 2
+    },
+    {
+      "location_slug": "torre-dados",
+      "type": "evidencia",
+      "display_content": "Log de acesso remoto a dispositivos externos: 'TowerCorp/Admin/KVann — sessão ativa 14 min — dispositivo: Fone-ID-RYO-7742 — frequência emitida: 7Hz'. Timestamp coincide com a hora da morte de Ryo.",
+      "decoded_hint": "KVann = iniciais de Kreuz Vann. Ele acessou remotamente o fone de ouvido de Ryo.",
+      "reveals_field": "how",
+      "order": 3
+    },
+    {
+      "location_slug": "catedral-codigo",
+      "type": "anagrama",
+      "display_content": "Ficha de concessão da frequência 7Hz, assinada por empresa fantasma: 'RAZUK ENTERPRISES'. Sem endereço físico ou registro válido. Rearranjar as letras de RAZUK revela o sobrenome do verdadeiro titular da licença.",
+      "decoded_hint": "RAZUK → rearranjar → KREUZ. Anagrama perfeito. Empresa de fachada de Kreuz Vann.",
+      "reveals_field": "who",
+      "order": 1
+    },
+    {
+      "location_slug": "catedral-codigo",
+      "type": "referencia",
+      "display_content": "Relatório financeiro da TowerCorp em arquivo público de licitações — linha destacada a caneta: 'Receita especial não identificada: 47.200.000 créditos'. Data coincide com o início da campanha eleitoral de Nova Kyros.",
+      "decoded_hint": null,
+      "reveals_field": "why",
+      "order": 2
+    },
+    {
+      "location_slug": "mercado-neon",
+      "type": "depoimento",
+      "display_content": "Informante no Mercado: 'Vi Ryo aqui três noites antes de ele morrer. Estava nervoso. Disse que descobriu que alguém usa as torres de rádio pra influenciar decisões das pessoas sem elas perceberem. Ia à imprensa de manhã. Nunca mais o vi.'",
+      "decoded_hint": null,
+      "reveals_field": "why",
+      "order": 1
+    },
+    {
+      "location_slug": "terminal-subterraneo",
+      "type": "analogia",
+      "display_content": "Diário de Ryo, encontrado numa mochila escondida no terminal: 'Como uma cobra que mata com seu sussurro sem ser vista, eles usaram meu próprio instrumento contra mim. Meu fone — minha extensão — virou a arma. O infrassom mata silenciosamente. Se você está lendo isso: vá à Torre de Dados. O acesso remoto está nos logs.'",
+      "decoded_hint": "Ryo sabia que seria alvo. Apontou diretamente para a Torre de Dados e para a arma: o fone hackeado.",
+      "reveals_field": "how",
+      "order": 1
+    }
+  ]
+}
