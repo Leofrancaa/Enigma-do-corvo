@@ -1,91 +1,79 @@
 -- ══════════════════════════════════════════════════════
 -- CIFRA URBANA: O Enigma do Corvo
--- 01_schema.sql — Criação do banco
--- Execute no SQL Editor do Supabase (banco zerado)
+-- 01_schema.sql — Criação do banco (idempotente)
+-- Execute no SQL Editor do Supabase
+-- Seguro de rodar mais de uma vez (IF NOT EXISTS em tudo)
 -- ══════════════════════════════════════════════════════
 
 -- ─── ENUMS ────────────────────────────────────────────
 
-CREATE TYPE room_status AS ENUM (
-  'LOBBY',
-  'CHARACTER_SELECT',
-  'CASE_INTRO',
-  'INVESTIGATION',
-  'DEDUCTION',
-  'RESOLUTION',
-  'ENDED',
-  'ABANDONED'
-);
+DO $$ BEGIN
+  CREATE TYPE room_status AS ENUM (
+    'LOBBY', 'CHARACTER_SELECT', 'CASE_INTRO',
+    'INVESTIGATION', 'DEDUCTION', 'RESOLUTION',
+    'ENDED', 'ABANDONED'
+  );
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
-CREATE TYPE transport_type AS ENUM (
-  'drone',
-  'hyperloop',
-  'magrail'
-);
+DO $$ BEGIN
+  CREATE TYPE transport_type AS ENUM ('drone', 'hyperloop', 'magrail');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
-CREATE TYPE clue_type AS ENUM (
-  'analogia',
-  'anagrama',
-  'cifra',
-  'referencia',
-  'depoimento',
-  'evidencia',
-  'plot_twist'
-);
+DO $$ BEGIN
+  CREATE TYPE clue_type AS ENUM (
+    'analogia', 'anagrama', 'cifra', 'referencia',
+    'depoimento', 'evidencia', 'plot_twist'
+  );
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
-CREATE TYPE reveals_field AS ENUM (
-  'who',
-  'where',
-  'how',
-  'why',
-  'context'
-);
+DO $$ BEGIN
+  CREATE TYPE reveals_field AS ENUM ('who', 'where', 'how', 'why', 'context');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
-CREATE TYPE difficulty AS ENUM (
-  'facil',
-  'medio',
-  'dificil'
-);
+DO $$ BEGIN
+  CREATE TYPE difficulty AS ENUM ('facil', 'medio', 'dificil');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
-CREATE TYPE player_action_type AS ENUM (
-  'move',
-  'partial_guess',
-  'final_guess',
-  'skip_turn',
-  'ready',
-  'select_character',
-  'start_game',
-  'end_game',
-  'force_deduction'
-);
+DO $$ BEGIN
+  CREATE TYPE player_action_type AS ENUM (
+    'move', 'partial_guess', 'final_guess', 'skip_turn',
+    'ready', 'select_character', 'start_game', 'end_game', 'force_deduction'
+  );
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 -- ─── MAPA FIXO (7 locais, mesmo para todos os jogos) ──
 
-CREATE TABLE locations (
-  id           uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
-  slug         text        NOT NULL UNIQUE,
-  name         text        NOT NULL,
+CREATE TABLE IF NOT EXISTS locations (
+  id           uuid         PRIMARY KEY DEFAULT gen_random_uuid(),
+  slug         text         NOT NULL UNIQUE,
+  name         text         NOT NULL,
   subtitle     text,
-  description  text        NOT NULL,
+  description  text         NOT NULL,
   image_url    text,
   icon_url     text,
   map_x        numeric(5,4) NOT NULL DEFAULT 0.5,
   map_y        numeric(5,4) NOT NULL DEFAULT 0.5,
-  is_start_hub boolean     NOT NULL DEFAULT false
+  is_start_hub boolean      NOT NULL DEFAULT false
 );
 
-CREATE TABLE location_connections (
+CREATE TABLE IF NOT EXISTS location_connections (
   id             uuid           PRIMARY KEY DEFAULT gen_random_uuid(),
   from_id        uuid           NOT NULL REFERENCES locations(id) ON DELETE CASCADE,
   to_id          uuid           NOT NULL REFERENCES locations(id) ON DELETE CASCADE,
   transport_type transport_type NOT NULL
 );
 
-CREATE INDEX idx_connections_from_id ON location_connections(from_id);
+CREATE INDEX IF NOT EXISTS idx_connections_from_id ON location_connections(from_id);
 
 -- ─── PERSONAGENS ──────────────────────────────────────
 
-CREATE TABLE characters (
+CREATE TABLE IF NOT EXISTS characters (
   id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   slug         text NOT NULL UNIQUE,
   name         text NOT NULL,
@@ -100,28 +88,28 @@ CREATE TABLE characters (
 
 -- ─── CASOS ────────────────────────────────────────────
 
-CREATE TABLE cases (
-  id                      uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
-  slug                    text        NOT NULL UNIQUE,
-  title                   text        NOT NULL,
-  narrative_intro         text        NOT NULL,
-  difficulty              difficulty  NOT NULL DEFAULT 'medio',
-  max_turns               int         NOT NULL DEFAULT 20,
-  max_errors              int         NOT NULL DEFAULT 3,
-  recommended_players_min int         NOT NULL DEFAULT 2,
-  recommended_players_max int         NOT NULL DEFAULT 6,
-  -- Solução: NUNCA exposta ao cliente via RLS
-  solution_who            text        NOT NULL,
-  solution_where_id       uuid        REFERENCES locations(id),
-  solution_how            text        NOT NULL,
-  solution_why            text        NOT NULL,
-  solution_explanation    text        NOT NULL,
+CREATE TABLE IF NOT EXISTS cases (
+  id                      uuid       PRIMARY KEY DEFAULT gen_random_uuid(),
+  slug                    text       NOT NULL UNIQUE,
+  title                   text       NOT NULL,
+  narrative_intro         text       NOT NULL,
+  difficulty              difficulty NOT NULL DEFAULT 'medio',
+  max_turns               int        NOT NULL DEFAULT 20,
+  max_errors              int        NOT NULL DEFAULT 3,
+  recommended_players_min int        NOT NULL DEFAULT 2,
+  recommended_players_max int        NOT NULL DEFAULT 6,
+  -- Solução: protegida por RLS, NUNCA exposta ao cliente
+  solution_who            text       NOT NULL,
+  solution_where_id       uuid       REFERENCES locations(id),
+  solution_how            text       NOT NULL,
+  solution_why            text       NOT NULL,
+  solution_explanation    text       NOT NULL,
   created_at              timestamptz NOT NULL DEFAULT now()
 );
 
 -- ─── PISTAS ───────────────────────────────────────────
 
-CREATE TABLE clues (
+CREATE TABLE IF NOT EXISTS clues (
   id              uuid          PRIMARY KEY DEFAULT gen_random_uuid(),
   case_id         uuid          NOT NULL REFERENCES cases(id) ON DELETE CASCADE,
   location_id     uuid          NOT NULL REFERENCES locations(id) ON DELETE CASCADE,
@@ -132,12 +120,12 @@ CREATE TABLE clues (
   "order"         int           NOT NULL DEFAULT 0
 );
 
-CREATE INDEX idx_clues_case_id     ON clues(case_id);
-CREATE INDEX idx_clues_location_id ON clues(location_id);
+CREATE INDEX IF NOT EXISTS idx_clues_case_id     ON clues(case_id);
+CREATE INDEX IF NOT EXISTS idx_clues_location_id ON clues(location_id);
 
 -- ─── SALAS ────────────────────────────────────────────
 
-CREATE TABLE rooms (
+CREATE TABLE IF NOT EXISTS rooms (
   id                uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
   code              text        NOT NULL UNIQUE,
   host_session_id   text        NOT NULL,
@@ -146,19 +134,18 @@ CREATE TABLE rooms (
   current_turn      int         NOT NULL DEFAULT 0,
   max_turns         int         NOT NULL DEFAULT 20,
   errors_remaining  int         NOT NULL DEFAULT 3,
-  -- FK circular adicionada depois da criação de players
-  current_player_id uuid,
+  current_player_id uuid,           -- FK adicionada depois (referência circular)
   created_at        timestamptz NOT NULL DEFAULT now(),
   started_at        timestamptz,
   ended_at          timestamptz
 );
 
-CREATE INDEX idx_rooms_code   ON rooms(code);
-CREATE INDEX idx_rooms_status ON rooms(status);
+CREATE INDEX IF NOT EXISTS idx_rooms_code   ON rooms(code);
+CREATE INDEX IF NOT EXISTS idx_rooms_status ON rooms(status);
 
 -- ─── JOGADORES ────────────────────────────────────────
 
-CREATE TABLE players (
+CREATE TABLE IF NOT EXISTS players (
   id                  uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
   room_id             uuid        NOT NULL REFERENCES rooms(id) ON DELETE CASCADE,
   session_id          text        NOT NULL,
@@ -175,20 +162,24 @@ CREATE TABLE players (
   joined_at           timestamptz NOT NULL DEFAULT now()
 );
 
-CREATE UNIQUE INDEX idx_players_room_session   ON players(room_id, session_id);
-CREATE        INDEX idx_players_room_id        ON players(room_id);
--- Um personagem por sala (NULL permitido = ainda não escolheu)
-CREATE UNIQUE INDEX idx_players_room_character ON players(room_id, character_id)
+CREATE UNIQUE INDEX IF NOT EXISTS idx_players_room_session ON players(room_id, session_id);
+CREATE        INDEX IF NOT EXISTS idx_players_room_id      ON players(room_id);
+-- Um personagem por sala (NULL = ainda não escolheu)
+CREATE UNIQUE INDEX IF NOT EXISTS idx_players_room_character
+  ON players(room_id, character_id)
   WHERE character_id IS NOT NULL;
 
--- Resolver referência circular rooms ↔ players
-ALTER TABLE rooms
-  ADD CONSTRAINT fk_rooms_current_player
-  FOREIGN KEY (current_player_id) REFERENCES players(id);
+-- Referência circular rooms ↔ players (adiciona só se não existir)
+DO $$ BEGIN
+  ALTER TABLE rooms
+    ADD CONSTRAINT fk_rooms_current_player
+    FOREIGN KEY (current_player_id) REFERENCES players(id);
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 -- ─── PISTAS DESCOBERTAS ───────────────────────────────
 
-CREATE TABLE discovered_clues (
+CREATE TABLE IF NOT EXISTS discovered_clues (
   id            uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
   room_id       uuid        NOT NULL REFERENCES rooms(id) ON DELETE CASCADE,
   player_id     uuid        NOT NULL REFERENCES players(id) ON DELETE CASCADE,
@@ -196,13 +187,13 @@ CREATE TABLE discovered_clues (
   discovered_at timestamptz NOT NULL DEFAULT now()
 );
 
--- Uma pista descoberta uma vez é visível para todos na sala
-CREATE UNIQUE INDEX idx_discovered_room_clue ON discovered_clues(room_id, clue_id);
-CREATE        INDEX idx_discovered_room_id   ON discovered_clues(room_id);
+-- Pista descoberta uma vez fica visível para a sala inteira
+CREATE UNIQUE INDEX IF NOT EXISTS idx_discovered_room_clue ON discovered_clues(room_id, clue_id);
+CREATE        INDEX IF NOT EXISTS idx_discovered_room_id   ON discovered_clues(room_id);
 
--- ─── LOG DE AÇÕES (auditoria + idempotência) ──────────
+-- ─── LOG DE AÇÕES ─────────────────────────────────────
 
-CREATE TABLE player_actions (
+CREATE TABLE IF NOT EXISTS player_actions (
   id               uuid               PRIMARY KEY DEFAULT gen_random_uuid(),
   client_action_id uuid               NOT NULL UNIQUE,
   room_id          uuid               NOT NULL REFERENCES rooms(id) ON DELETE CASCADE,
@@ -213,12 +204,12 @@ CREATE TABLE player_actions (
   created_at       timestamptz        NOT NULL DEFAULT now()
 );
 
-CREATE UNIQUE INDEX idx_actions_client_id ON player_actions(client_action_id);
-CREATE        INDEX idx_actions_room_id   ON player_actions(room_id);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_actions_client_id ON player_actions(client_action_id);
+CREATE        INDEX IF NOT EXISTS idx_actions_room_id   ON player_actions(room_id);
 
 -- ─── PALPITES ─────────────────────────────────────────
 
-CREATE TABLE guesses (
+CREATE TABLE IF NOT EXISTS guesses (
   id            uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
   room_id       uuid        NOT NULL REFERENCES rooms(id) ON DELETE CASCADE,
   player_id     uuid        NOT NULL REFERENCES players(id) ON DELETE CASCADE,
@@ -232,4 +223,4 @@ CREATE TABLE guesses (
   created_at    timestamptz NOT NULL DEFAULT now()
 );
 
-CREATE INDEX idx_guesses_room_id ON guesses(room_id);
+CREATE INDEX IF NOT EXISTS idx_guesses_room_id ON guesses(room_id);
