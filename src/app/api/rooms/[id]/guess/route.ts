@@ -21,14 +21,16 @@ export async function POST(
       return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
     }
 
-    const { answers, isFinal, clientActionId } = parsed.data;
+    const { answers, isFinal, isPrivate, clientActionId } = parsed.data;
     const sessionId = await getSessionId();
     if (!sessionId) return NextResponse.json({ error: "Sessão não encontrada." }, { status: 401 });
 
     const room = await db.query.rooms.findFirst({ where: eq(rooms.id, roomId) });
     if (!room) return NextResponse.json({ error: "Sala não encontrada." }, { status: 404 });
 
-    const allowedStatuses = isFinal ? ["DEDUCTION"] : ["INVESTIGATION", "DEDUCTION"];
+    const allowedStatuses = isPrivate
+      ? ["INVESTIGATION", "DEDUCTION"]
+      : isFinal ? ["DEDUCTION"] : ["INVESTIGATION", "DEDUCTION"];
     if (!allowedStatuses.includes(room.status)) {
       return NextResponse.json({ error: "Não é possível fazer dedução agora." }, { status: 409 });
     }
@@ -61,6 +63,11 @@ export async function POST(
     }
 
     const isCorrect = correctCount === totalCount && totalCount > 0;
+
+    // Private individual deduction: return result without any game state changes
+    if (isPrivate) {
+      return NextResponse.json({ isCorrect, correctCount, totalCount, score: 0, resultDetails });
+    }
 
     const score = computeScore({
       correctFields: correctCount,

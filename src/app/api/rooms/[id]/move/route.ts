@@ -10,8 +10,8 @@ import { getReachableCells, getCell, isEntryCell, isRoomCell, cellSlug, ENTRY_CO
 import { rollDice, getNextPlayerId } from "@/lib/game/rules";
 
 const moveSchema = z.object({
-  toRow: z.number().int().min(0).max(19),
-  toCol: z.number().int().min(0).max(23),
+  toRow: z.number().int().min(0).max(25),
+  toCol: z.number().int().min(0).max(27),
   clientActionId: z.string().uuid(),
 });
 
@@ -50,7 +50,7 @@ export async function POST(
     }
 
     // Validate destination is reachable
-    const reachable = getReachableCells(player.gridRow ?? 7, player.gridCol ?? 11, room.currentDice);
+    const reachable = getReachableCells(player.gridRow ?? 9, player.gridCol ?? 13, room.currentDice);
     const isReachable = reachable.some(([r, c]) => r === toRow && c === toCol);
     if (!isReachable) {
       return NextResponse.json({ error: "Destino fora do alcance do dado." }, { status: 400 });

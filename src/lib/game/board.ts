@@ -1,17 +1,18 @@
 /**
- * Tabuleiro 2D — 24 colunas × 20 linhas, CELL_PX = 120px
- * Total: 2880 × 2400px (pannável + zoom 0.25x–1.8x)
+ * Tabuleiro 2D — 28 colunas × 26 linhas, CELL_PX = 120px
+ * Total: 3360 × 3120px (pannável + zoom 0.2x–2x)
  *
- * Locais maiores e bem espaçados:
- *   Lab/Beco 5×4 = 600×480px | Parque 7×4 = 840×480px
- *   Café/Armazém 5×6 = 600×720px | Biblioteca 7×6 = 840×720px
- *   Delegacia 8×3 = 960×360px
+ * Salas grandes e bem espaçadas:
+ *   Lab/Beco 6×5 = 720×600px | Parque 8×5 = 960×600px
+ *   Café/Armazém 6×8 = 720×960px | Biblioteca 9×8 = 1080×960px
+ *   Delegacia 11×4 = 1320×480px
  *
+ * Gap entre grupos de salas: ≥ 4 linhas de corredor
  * Entradas: 1 por lado, nunca adjacentes
  */
 
-export const BOARD_ROWS = 20;
-export const BOARD_COLS = 24;
+export const BOARD_ROWS = 26;
+export const BOARD_COLS = 28;
 export const CELL_PX    = 120;
 
 export const ROOM_CODE_TO_SLUG: Record<number, string> = {
@@ -34,61 +35,66 @@ export const ENTRY_CODE_TO_SLUG: Record<number, string> = {
   26: "delegacia-central",
 };
 
-// Imagens: cobre exatamente as células de sala (10-16)
+// Imagens: só células de sala, entradas ficam fora dos retângulos
 export const ROOM_RECTS: Record<string, [number, number, number, number]> = {
-  "laboratorio-forense": [1, 4, 2, 6],
-  "parque-oasis-verde":  [1, 4, 9, 15],
-  "beco-gato-preto":     [1, 4, 18, 22],
-  "cafe-pista-quente":   [8, 13, 1, 5],
-  "biblioteca-publica":  [8, 13, 9, 15],
-  "armazem-portuario":   [8, 13, 18, 22],
-  "delegacia-central":   [17, 19, 8, 15],
+  "laboratorio-forense": [2, 6, 1, 6],
+  "parque-oasis-verde":  [2, 6, 10, 17],
+  "beco-gato-preto":     [2, 6, 21, 26],
+  "cafe-pista-quente":   [11, 18, 0, 5],
+  "biblioteca-publica":  [11, 18, 10, 18],
+  "armazem-portuario":   [11, 18, 22, 27],
+  "delegacia-central":   [22, 25, 9, 19],
 };
 
-// Todos iniciam no corredor central (longe de qualquer entrada)
+// Ponto de partida único — gap central entre top e middle rooms
 export const CHARACTER_START: Record<string, [number, number]> = {
-  "faro-silva":    [7, 11],
-  "lupa-costa":    [7, 11],
-  "flash-santos":  [7, 11],
-  "sussurro-lima": [7, 11],
-  "pixel-mendes":  [7, 11],
-  "rino-pereira":  [7, 11],
+  "faro-silva":    [9, 13],
+  "lupa-costa":    [9, 13],
+  "flash-santos":  [9, 13],
+  "sussurro-lima": [9, 13],
+  "pixel-mendes":  [9, 13],
+  "rino-pereira":  [9, 13],
 };
-export const DEFAULT_START: [number, number] = [7, 11];
+export const DEFAULT_START: [number, number] = [9, 13];
 
 const P = 0;
 
-// Tudo walkable — sem paredes (-1). Cada célula é caminho ou sala.
-// Entradas por sala e sua posição (verificadas com entryDir):
-//   Lab 20: (5,2)↑ (5,6)↑
-//   Parque 21: (5,10)↑ (5,14)↑
-//   Beco 22: (5,19)↑ (5,21)↑
-//   Café 23: (10,6)← (14,3)↑
-//   Biblioteca 24: (10,8)→ (11,16)← (14,12)↑
-//   Armazém 25: (10,17)→ (14,20)↑
-//   Delegacia 26: (16,9)↓ (16,13)↓ (17,7)→ (17,16)←
+// Entradas (sem paredes — tudo walkable exceto salas):
+//  Lab 20: (7,2)↑ (7,5)↑
+//  Parque 21: (7,12)↑ (7,15)↑
+//  Beco 22: (7,22)↑ (7,25)↑
+//  Café 23: (14,6)← (19,2)↑
+//  Biblioteca 24: (14,9)→ (15,19)← (19,13)↑
+//  Armazém 25: (14,21)→ (19,24)↑
+//  Delegacia 26: (21,11)↓ (21,16)↓ (22,8)→ (22,20)←
 export const BOARD_GRID: number[][] = [
-  //  0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18  19  20  21  22  23
-  [ P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P], // 0
-  [ P,  P, 10, 10, 10, 10, 10,  P,  P, 11, 11, 11, 11, 11, 11, 11,  P,  P, 12, 12, 12, 12, 12,  P], // 1
-  [ P,  P, 10, 10, 10, 10, 10,  P,  P, 11, 11, 11, 11, 11, 11, 11,  P,  P, 12, 12, 12, 12, 12,  P], // 2
-  [ P,  P, 10, 10, 10, 10, 10,  P,  P, 11, 11, 11, 11, 11, 11, 11,  P,  P, 12, 12, 12, 12, 12,  P], // 3
-  [ P,  P, 10, 10, 10, 10, 10,  P,  P, 11, 11, 11, 11, 11, 11, 11,  P,  P, 12, 12, 12, 12, 12,  P], // 4
-  [ P,  P, 20,  P,  P,  P, 20,  P,  P,  P, 21,  P,  P,  P, 21,  P,  P,  P,  P, 22,  P, 22,  P,  P], // 5
-  [ P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P], // 6
-  [ P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P], // 7  ← START
-  [ P, 13, 13, 13, 13, 13,  P,  P,  P, 14, 14, 14, 14, 14, 14, 14,  P,  P, 15, 15, 15, 15, 15,  P], // 8
-  [ P, 13, 13, 13, 13, 13,  P,  P,  P, 14, 14, 14, 14, 14, 14, 14,  P,  P, 15, 15, 15, 15, 15,  P], // 9
-  [ P, 13, 13, 13, 13, 13, 23,  P, 24, 14, 14, 14, 14, 14, 14, 14,  P, 25, 15, 15, 15, 15, 15,  P], // 10 entradas laterais
-  [ P, 13, 13, 13, 13, 13,  P,  P,  P, 14, 14, 14, 14, 14, 14, 14, 24,  P, 15, 15, 15, 15, 15,  P], // 11
-  [ P, 13, 13, 13, 13, 13,  P,  P,  P, 14, 14, 14, 14, 14, 14, 14,  P,  P, 15, 15, 15, 15, 15,  P], // 12
-  [ P, 13, 13, 13, 13, 13,  P,  P,  P, 14, 14, 14, 14, 14, 14, 14,  P,  P, 15, 15, 15, 15, 15,  P], // 13
-  [ P,  P,  P, 23,  P,  P,  P,  P,  P,  P,  P,  P, 24,  P,  P,  P,  P,  P,  P,  P, 25,  P,  P,  P], // 14 entradas baixo
-  [ P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P], // 15
-  [ P,  P,  P,  P,  P,  P,  P,  P,  P, 26,  P,  P,  P, 26,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P], // 16 delegacia top
-  [ P,  P,  P,  P,  P,  P,  P, 26, 16, 16, 16, 16, 16, 16, 16, 16, 26,  P,  P,  P,  P,  P,  P,  P], // 17 delegacia lados+sala
-  [ P,  P,  P,  P,  P,  P,  P,  P, 16, 16, 16, 16, 16, 16, 16, 16,  P,  P,  P,  P,  P,  P,  P,  P], // 18
-  [ P,  P,  P,  P,  P,  P,  P,  P, 16, 16, 16, 16, 16, 16, 16, 16,  P,  P,  P,  P,  P,  P,  P,  P], // 19
+  //  0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18  19  20  21  22  23  24  25  26  27
+  [ P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P], // 0
+  [ P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P], // 1
+  [ P,  P, 10, 10, 10, 10, 10, 10,  P,  P, 11, 11, 11, 11, 11, 11, 11, 11,  P,  P, 12, 12, 12, 12, 12, 12, 12,  P], // 2
+  [ P,  P, 10, 10, 10, 10, 10, 10,  P,  P, 11, 11, 11, 11, 11, 11, 11, 11,  P,  P, 12, 12, 12, 12, 12, 12, 12,  P], // 3
+  [ P,  P, 10, 10, 10, 10, 10, 10,  P,  P, 11, 11, 11, 11, 11, 11, 11, 11,  P,  P, 12, 12, 12, 12, 12, 12, 12,  P], // 4
+  [ P,  P, 10, 10, 10, 10, 10, 10,  P,  P, 11, 11, 11, 11, 11, 11, 11, 11,  P,  P, 12, 12, 12, 12, 12, 12, 12,  P], // 5
+  [ P,  P, 10, 10, 10, 10, 10, 10,  P,  P, 11, 11, 11, 11, 11, 11, 11, 11,  P,  P, 12, 12, 12, 12, 12, 12, 12,  P], // 6
+  [ P,  P, 20,  P,  P, 20,  P,  P,  P,  P,  P, 21,  P,  P,  P, 21,  P,  P,  P,  P,  P,  P, 22,  P,  P, 22,  P,  P], // 7 ← entradas top
+  [ P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P], // 8
+  [ P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P], // 9  ← START
+  [ P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P], // 10
+  [13, 13, 13, 13, 13, 13,  P,  P,  P, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14,  P,  P, 15, 15, 15, 15, 15, 15, 15], // 11
+  [13, 13, 13, 13, 13, 13,  P,  P,  P, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14,  P,  P, 15, 15, 15, 15, 15, 15, 15], // 12
+  [13, 13, 13, 13, 13, 13,  P,  P,  P, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14,  P,  P, 15, 15, 15, 15, 15, 15, 15], // 13
+  [13, 13, 13, 13, 13, 13, 23,  P, 24, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14,  P, 25, 15, 15, 15, 15, 15, 15, 15], // 14 ← entradas lat.
+  [13, 13, 13, 13, 13, 13,  P,  P,  P, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 24,  P, 15, 15, 15, 15, 15, 15, 15], // 15
+  [13, 13, 13, 13, 13, 13,  P,  P,  P, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14,  P,  P, 15, 15, 15, 15, 15, 15, 15], // 16
+  [13, 13, 13, 13, 13, 13,  P,  P,  P, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14,  P,  P, 15, 15, 15, 15, 15, 15, 15], // 17
+  [13, 13, 13, 13, 13, 13,  P,  P,  P, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14,  P,  P, 15, 15, 15, 15, 15, 15, 15], // 18
+  [ P,  P, 23,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P, 24,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P, 25,  P,  P,  P], // 19 ← entradas bottom
+  [ P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P], // 20
+  [ P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P, 26,  P,  P,  P,  P, 26,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P], // 21 ← delegacia top
+  [ P,  P,  P,  P,  P,  P,  P,  P, 26, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 26,  P,  P,  P,  P,  P,  P,  P], // 22 ← lados+sala
+  [ P,  P,  P,  P,  P,  P,  P,  P,  P, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16,  P,  P,  P,  P,  P,  P,  P,  P], // 23
+  [ P,  P,  P,  P,  P,  P,  P,  P,  P, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16,  P,  P,  P,  P,  P,  P,  P,  P], // 24
+  [ P,  P,  P,  P,  P,  P,  P,  P,  P, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16,  P,  P,  P,  P,  P,  P,  P,  P], // 25
 ];
 
 // ─── Utilitários ─────────────────────────────────────────────────────────────
@@ -116,9 +122,7 @@ export function navigableNeighbors(row: number, col: number): Array<[number, num
 export function getReachableCells(fromRow: number, fromCol: number, maxSteps: number): Array<[number,number]> {
   if (maxSteps <= 0) return [];
   const visited = new Set<string>([`${fromRow},${fromCol}`]);
-  const queue: Array<{ row: number; col: number; steps: number }> = [
-    { row: fromRow, col: fromCol, steps: 0 },
-  ];
+  const queue: Array<{row:number;col:number;steps:number}> = [{row:fromRow,col:fromCol,steps:0}];
   const reachable: Array<[number,number]> = [];
   while (queue.length > 0) {
     const cur = queue.shift()!;
@@ -128,7 +132,7 @@ export function getReachableCells(fromRow: number, fromCol: number, maxSteps: nu
       if (!visited.has(key)) {
         visited.add(key);
         reachable.push([nr,nc]);
-        queue.push({ row: nr, col: nc, steps: cur.steps+1 });
+        queue.push({row:nr,col:nc,steps:cur.steps+1});
       }
     }
   }
