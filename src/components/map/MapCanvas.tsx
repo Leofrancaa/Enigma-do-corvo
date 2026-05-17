@@ -161,9 +161,10 @@ export function MapCanvas({ locations, players, reachable, onCellClick }: Props)
                 </linearGradient>
               </defs>
               <rect x={x} y={y} width={w} height={h} fill={`url(#g-${slug})`} rx={4} />
-              <text x={x+w/2} y={y+h-12} textAnchor="middle"
-                fontSize={Math.min(18, Math.max(12, w/6))}
-                fontFamily="monospace" fontWeight="bold" fill="#fff">
+              <text x={x+w/2} y={y+h-CELL_PX*0.18} textAnchor="middle"
+                fontSize={CELL_PX * 0.38}
+                fontFamily="monospace" fontWeight="bold" fill="#fff"
+                paintOrder="stroke" stroke="rgba(0,0,0,0.8)" strokeWidth={CELL_PX * 0.06} strokeLinejoin="round">
                 {loc?.name ?? slug}
               </text>
             </g>
