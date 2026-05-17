@@ -1,10 +1,10 @@
-{
+﻿{
   "slug": "o-fantasma-da-biblioteca",
   "title": "O Fantasma da Biblioteca",
   "difficulty": "medio",
   "max_turns": 28,
   "max_errors": 5,
-  "recommended_players_min": 3,
+  "recommended_players_min": 2,
   "recommended_players_max": 6,
   "narrative_intro": "A Biblioteca Pública, um santuário de conhecimento, foi palco de um mistério que desafia a lógica. A bibliotecária-chefe, Sra. Elara Vance, uma mulher metódica e apaixonada por livros raros, desapareceu sem deixar vestígios. A única pista: um livro de contos de fadas antigos, aberto na página de um conto sobre um 'fantasma que rouba memórias', e uma mancha de tinta fresca em uma estante que deveria estar intocada há anos.\n\nO Detetive Faro Silva, ao chegar à cena, notou que nada parecia ter sido roubado, mas a atmosfera era de um silêncio pesado, quase opressor. A Dra. Lupa Costa encontrou um fio de cabelo incomum preso entre as páginas do livro, e o Analista de TI Pixel Mendes detectou uma breve, mas intensa, atividade de rede no servidor da biblioteca na hora do desaparecimento, vinda de um IP desconhecido.\n\nElara Vance estava catalogando uma coleção recém-adquirida de diários de um famoso historiador local, conhecido por desvendar segredos antigos da cidade. Alguém não queria que esses segredos viessem à luz. Onde está Elara Vance? Quem a levou? E qual o segredo que ela estava prestes a descobrir?",
   "questions": [
@@ -77,3 +77,4 @@
     }
   ]
 }
+

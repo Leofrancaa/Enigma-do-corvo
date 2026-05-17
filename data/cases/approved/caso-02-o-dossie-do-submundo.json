@@ -1,10 +1,10 @@
-{
+﻿{
   "slug": "o-dossie-do-submundo",
   "title": "O Dossiê do Submundo",
   "difficulty": "dificil",
   "max_turns": 20,
   "max_errors": 3,
-  "recommended_players_min": 3,
+  "recommended_players_min": 2,
   "recommended_players_max": 6,
   "narrative_intro": "Fátima Rolo era o tipo de jornalista que não parava quando devia parar.\n\nFreelancer, 34 anos, especializada em crime organizado. Três prêmios de jornalismo investigativo. Uma inimiga por cada reportagem publicada.\n\nNa madrugada de uma sexta-feira, um vigia noturno encontrou o corpo de Fátima flutuando na doca 7 do Antigo Armazém Portuário. A câmera que ela sempre carregava: destruída. O celular: desaparecido. O pendrive que ela protegia como ouro: vazio.\n\nA perícia inicial disse: afogamento acidental. Mas a Dra. Lupa Costa, do Laboratório Forense, não acreditou por um segundo.\n\nFátima estava prestes a publicar 'O Dossiê do Submundo' — uma investigação de 18 meses que prometia revelar ao público a verdadeira identidade de 'Ferro', o lendário operador de uma rede de contrabando que movimentava milhões pelo porto da cidade. Ninguém sabia quem era 'Ferro'. Ninguém que contou continuou vivo para confirmar.\n\nAlguém chegou ao dossiê antes da publicação. Alguém que não podia se dar ao luxo de ser exposto.\n\nO relógio está correndo. O criminoso já sabe que a polícia está investigando. Descubram quem é 'Ferro' — antes que as provas desapareçam no fundo do mar.",
   "questions": [
@@ -93,3 +93,4 @@
     }
   ]
 }
+

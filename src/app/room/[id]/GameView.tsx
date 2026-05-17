@@ -48,13 +48,13 @@ export function GameView() {
 
   const reachable = useMemo((): Array<[number, number]> => {
     if (!isMyTurn || !me || !currentDice) return [];
-    return getReachableCells(me.gridRow ?? 9, me.gridCol ?? 13, currentDice);
+    return getReachableCells(me.gridRow ?? 9, me.gridCol ?? 14, currentDice);
   }, [isMyTurn, me?.gridRow, me?.gridCol, currentDice]);
 
   const playerDots = room.players.map((p: Player, idx: number) => ({
     id: p.id,
     gridRow: p.gridRow ?? 9,
-    gridCol: p.gridCol ?? 13,
+    gridCol: p.gridCol ?? 14,
     nickname: p.nickname,
     colorIndex: idx,
     isMe: p.id === me?.id,
