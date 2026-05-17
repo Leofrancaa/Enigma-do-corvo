@@ -88,8 +88,6 @@ export async function getRoomSnapshot(roomId: string, sessionId: string) {
   // All characters (for character select UI)
   const allCharacters = await db.select().from(characters).orderBy(characters.name);
 
-  const me = room.players.find((p) => p.sessionId === sessionId) ?? null;
-
   // Flatten discoveredClues: the DB join returns { clue: Clue, ... }
   // but the client types expect flat Clue objects with discoveredAt
   const flatClues = discovered.map((d) => ({
