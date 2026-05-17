@@ -156,6 +156,20 @@ export async function getUndiscoveredCluesForLocation(
   return allClues.filter((c) => !discoveredIds.has(c.id));
 }
 
+/** Versão por slug do local (para o novo sistema de grade) */
+export async function getUndiscoveredCluesForLocationSlug(
+  roomId: string,
+  locationSlug: string,
+  caseId: string
+) {
+  // Find the location by slug first
+  const loc = await db.query.locations.findFirst({
+    where: eq(locations.slug, locationSlug),
+  });
+  if (!loc) return [];
+  return getUndiscoveredCluesForLocation(roomId, loc.id, caseId);
+}
+
 // ─── Solution (server-only — never call from client route without auth) ───────
 
 export async function getCaseSolution(caseId: string) {

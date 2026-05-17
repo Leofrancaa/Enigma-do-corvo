@@ -2,200 +2,224 @@
 
 import { useRef, useState } from "react";
 import { useGesture } from "@use-gesture/react";
-import type { Location, LocationConnection } from "@/types/game";
+import {
+  BOARD_GRID,
+  BOARD_ROWS,
+  BOARD_COLS,
+  CELL_PX,
+  ROOM_RECTS,
+  ENTRY_DIRECTION,
+  isNavigable,
+  isRoomCell,
+  isEntryCell,
+} from "@/lib/game/board";
+import type { Location } from "@/types/game";
 
-// Posições fixas dos 7 locais no tabuleiro (viewBox 1000x650)
-const NODE_POSITIONS: Record<string, { cx: number; cy: number }> = {
-  "observatorio-zenite":  { cx: 500, cy: 70  },
-  "torre-dados":          { cx: 185, cy: 235 },
-  "terminal-subterraneo": { cx: 500, cy: 310 },
-  "catedral-codigo":      { cx: 815, cy: 235 },
-  "mercado-neon":         { cx: 150, cy: 470 },
-  "docas-silicio":        { cx: 850, cy: 470 },
-  "beco-cifras":          { cx: 500, cy: 560 },
-};
+const PLAYER_COLORS = ["#00e5ff", "#ff2a6d", "#a855f7", "#22c55e", "#f59e0b", "#3b82f6"];
+const PATH_COLOR = "#d4c090";
+const PATH_STROKE = "#b8a070";
+const ENTRY_COLOR = "#e8d49a";
+const BOARD_BG = "#1a1208";
 
-const CARD_W = 140;
-const CARD_H = 95;
+const SVG_W = BOARD_COLS * CELL_PX;
+const SVG_H = BOARD_ROWS * CELL_PX;
+
+interface PlayerDot {
+  id: string;
+  gridRow: number;
+  gridCol: number;
+  nickname: string;
+  colorIndex: number;
+  isMe: boolean;
+  avatarUrl?: string | null;
+}
 
 interface Props {
   locations: Location[];
-  connections: LocationConnection[];
-  players: Array<{ id: string; currentLocationId: string | null; nickname: string; character?: { avatarUrl?: string | null } | null }>;
-  myPlayerId: string | null;
-  currentPlayerId: string | null;
-  reachable: string[];
-  onLocationClick?: (locationId: string) => void;
+  players: PlayerDot[];
+  reachable: Array<[number, number]>;
+  onCellClick?: (row: number, col: number) => void;
+  isMobile?: boolean;
 }
 
-export function MapCanvas({
-  locations,
-  connections,
-  players,
-  myPlayerId,
-  currentPlayerId,
-  reachable,
-  onLocationClick,
-}: Props) {
-  const svgRef = useRef<SVGSVGElement>(null);
-  const [pan, setPan] = useState({ x: 0, y: 0 });
-  const [scale, setScale] = useState(1);
+// Arrow SVG paths by direction
+function ArrowPath({ direction, cx, cy, size }: { direction: string; cx: number; cy: number; size: number }) {
+  const h = size * 0.5;
+  switch (direction) {
+    case "up":
+      return <polygon points={`${cx},${cy - h} ${cx - h},${cy + h} ${cx + h},${cy + h}`} fill="#ff2a6d" opacity={0.85} />;
+    case "down":
+      return <polygon points={`${cx},${cy + h} ${cx - h},${cy - h} ${cx + h},${cy - h}`} fill="#ff2a6d" opacity={0.85} />;
+    case "left":
+      return <polygon points={`${cx - h},${cy} ${cx + h},${cy - h} ${cx + h},${cy + h}`} fill="#ff2a6d" opacity={0.85} />;
+    case "right":
+      return <polygon points={`${cx + h},${cy} ${cx - h},${cy - h} ${cx - h},${cy + h}`} fill="#ff2a6d" opacity={0.85} />;
+    default:
+      return null;
+  }
+}
 
+export function MapCanvas({ locations, players, reachable, onCellClick, isMobile = false }: Props) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+
+  // Pan only on mobile, fixed on desktop
   useGesture(
     {
-      onDrag: ({ delta: [dx, dy] }) => setPan((p) => ({ x: p.x + dx, y: p.y + dy })),
-      onPinch: ({ offset: [s] }) => setScale(Math.min(Math.max(s, 0.4), 2.5)),
-      onWheel: ({ delta: [, dy] }) => setScale((s) => Math.min(Math.max(s - dy * 0.001, 0.4), 2.5)),
+      onDrag: ({ delta: [dx, dy] }) => {
+        if (!isMobile) return;
+        setPan((p) => ({
+          x: Math.min(0, Math.max(p.x + dx, -(SVG_W - (containerRef.current?.clientWidth ?? SVG_W)))),
+          y: Math.min(0, Math.max(p.y + dy, -(SVG_H - (containerRef.current?.clientHeight ?? SVG_H)))),
+        }));
+      },
     },
-    { target: svgRef, eventOptions: { passive: false } }
+    { target: containerRef, eventOptions: { passive: false } }
   );
 
-  function getPos(loc: Location) {
-    return NODE_POSITIONS[loc.slug] ?? {
-      cx: parseFloat(loc.mapX) * 1000,
-      cy: parseFloat(loc.mapY) * 650,
-    };
-  }
+  const reachableSet = new Set(reachable.map(([r, c]) => `${r},${c}`));
 
-  const isMyTurn = myPlayerId === currentPlayerId;
+  // Build a slug → location map
+  const slugToLoc = new Map<string, Location>();
+  for (const loc of locations) slugToLoc.set(loc.slug, loc);
 
   return (
-    <div className="relative w-full h-full overflow-hidden bg-zinc-950 rounded-sm border border-zinc-800">
+    <div
+      ref={containerRef}
+      className="w-full h-full overflow-hidden touch-none select-none"
+      style={{ background: BOARD_BG, cursor: isMobile ? "grab" : "default" }}
+    >
       <svg
-        ref={svgRef}
-        viewBox="0 0 1000 650"
-        className="w-full h-full touch-none select-none cursor-grab active:cursor-grabbing"
-        style={{ touchAction: "none" }}
+        width={SVG_W}
+        height={SVG_H}
+        viewBox={`0 0 ${SVG_W} ${SVG_H}`}
+        style={{
+          transform: isMobile ? `translate(${pan.x}px, ${pan.y}px)` : undefined,
+          display: "block",
+          // Center on desktop
+          margin: isMobile ? undefined : "auto",
+        }}
       >
-        {/* Grid background */}
-        <defs>
-          <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse">
-            <path d="M 50 0 L 0 0 0 50" fill="none" stroke="rgba(0,229,255,0.05)" strokeWidth="1" />
-          </pattern>
-        </defs>
+        {/* Background */}
+        <rect width={SVG_W} height={SVG_H} fill={BOARD_BG} />
 
-        <g transform={`translate(${pan.x}, ${pan.y}) scale(${scale})`}>
-          <rect width="1000" height="650" fill="url(#grid)" />
+        {/* Board border */}
+        <rect x={2} y={2} width={SVG_W - 4} height={SVG_H - 4} fill="none" stroke="#8B6914" strokeWidth={3} rx={4} />
 
-          {/* Connections */}
-          {connections.map((conn) => {
-            const from = locations.find((l) => l.id === conn.fromId);
-            const to = locations.find((l) => l.id === conn.toId);
-            if (!from || !to) return null;
-            const fp = getPos(from);
-            const tp = getPos(to);
-            return (
-              <line
-                key={conn.id}
-                x1={fp.cx} y1={fp.cy}
-                x2={tp.cx} y2={tp.cy}
-                stroke="rgba(0,229,255,0.15)"
-                strokeWidth={3}
-                strokeDasharray="8 5"
-              />
-            );
-          })}
+        {/* ─── Room images (drawn first as background) ─── */}
+        {Object.entries(ROOM_RECTS).map(([slug, [rs, re, cs, ce]]) => {
+          const x = cs * CELL_PX;
+          const y = rs * CELL_PX;
+          const w = (ce - cs + 1) * CELL_PX;
+          const h = (re - rs + 1) * CELL_PX;
+          const loc = slugToLoc.get(slug);
+          return (
+            <g key={slug}>
+              <rect x={x} y={y} width={w} height={h} fill="#2a1f0a" stroke="#8B6914" strokeWidth={1.5} />
+              {loc?.imageUrl && (
+                <image
+                  href={loc.imageUrl}
+                  x={x + 1} y={y + 1}
+                  width={w - 2} height={h - 2}
+                  preserveAspectRatio="xMidYMid slice"
+                />
+              )}
+              {/* Room overlay with name */}
+              <rect x={x} y={y + h - 20} width={w} height={20} fill="rgba(0,0,0,0.7)" />
+              <text
+                x={x + w / 2}
+                y={y + h - 7}
+                textAnchor="middle"
+                fontSize="8"
+                fontFamily="monospace"
+                fontWeight="bold"
+                fill="#fff"
+              >
+                {loc?.name ?? slug}
+              </text>
+            </g>
+          );
+        })}
 
-          {/* Location nodes */}
-          {locations.map((loc) => {
-            const { cx, cy } = getPos(loc);
-            const x = cx - CARD_W / 2;
-            const y = cy - CARD_H / 2;
-            const isReachable = reachable.includes(loc.id);
-            const playersHere = players.filter((p) => p.currentLocationId === loc.id);
+        {/* ─── Path and entry cells ─── */}
+        {BOARD_GRID.map((row, ri) =>
+          row.map((code, ci) => {
+            if (code === -1 || isRoomCell(code)) return null;
+
+            const x = ci * CELL_PX;
+            const y = ri * CELL_PX;
+            const key = `${ri},${ci}`;
+            const isReachable = reachableSet.has(key);
+            const isEntry = isEntryCell(code);
 
             return (
               <g
-                key={loc.id}
-                onClick={() => isReachable && isMyTurn && onLocationClick?.(loc.id)}
-                style={{ cursor: isReachable && isMyTurn ? "pointer" : "default" }}
+                key={key}
+                onClick={() => isReachable && onCellClick?.(ri, ci)}
+                style={{ cursor: isReachable ? "pointer" : "default" }}
               >
-                {/* Pulse ring when reachable */}
-                {isReachable && isMyTurn && (
+                {/* Cell background */}
+                <rect
+                  x={x + 1} y={y + 1}
+                  width={CELL_PX - 2} height={CELL_PX - 2}
+                  rx={4} ry={4}
+                  fill={isReachable ? "#5aecb8" : isEntry ? ENTRY_COLOR : PATH_COLOR}
+                  stroke={isReachable ? "#00c88a" : PATH_STROKE}
+                  strokeWidth={isReachable ? 2 : 1}
+                />
+
+                {/* Pulse ring for reachable */}
+                {isReachable && (
                   <rect
-                    x={x - 4} y={y - 4}
-                    width={CARD_W + 8} height={CARD_H + 8}
-                    rx={6} ry={6}
+                    x={x + 1} y={y + 1}
+                    width={CELL_PX - 2} height={CELL_PX - 2}
+                    rx={4} ry={4}
                     fill="none"
                     stroke="#00e5ff"
-                    strokeWidth={2}
+                    strokeWidth={1.5}
                     opacity={0.6}
                     className="animate-pulse"
                   />
                 )}
 
-                {/* Card background */}
-                <rect
-                  x={x} y={y}
-                  width={CARD_W} height={CARD_H}
-                  rx={4} ry={4}
-                  fill={isReachable && isMyTurn ? "rgba(0,229,255,0.08)" : "#18181b"}
-                  stroke={isReachable && isMyTurn ? "#00e5ff" : "#3f3f46"}
-                  strokeWidth={isReachable && isMyTurn ? 1.5 : 1}
-                />
-
-                {/* Location image */}
-                {loc.imageUrl && (
-                  <image
-                    href={loc.imageUrl}
-                    x={x + 2} y={y + 2}
-                    width={CARD_W - 4} height={CARD_H - 28}
-                    preserveAspectRatio="xMidYMid slice"
-                    style={{ borderRadius: 3 }}
+                {/* Entry arrow */}
+                {isEntry && (
+                  <ArrowPath
+                    direction={ENTRY_DIRECTION[code] ?? "up"}
+                    cx={x + CELL_PX / 2}
+                    cy={y + CELL_PX / 2}
+                    size={10}
                   />
                 )}
-
-                {/* Image overlay gradient */}
-                <rect
-                  x={x + 2} y={y + CARD_H - 42}
-                  width={CARD_W - 4} height={40}
-                  rx={2} ry={2}
-                  fill="url(#cardGrad)"
-                />
-
-                {/* Location name */}
-                <text
-                  x={cx}
-                  y={y + CARD_H - 10}
-                  textAnchor="middle"
-                  fontSize="9"
-                  fontFamily="monospace"
-                  fill={isReachable && isMyTurn ? "#00e5ff" : "#a1a1aa"}
-                  fontWeight={isReachable && isMyTurn ? "bold" : "normal"}
-                >
-                  {loc.name.length > 18 ? loc.name.slice(0, 17) + "…" : loc.name}
-                </text>
-
-                {/* Player dots */}
-                {playersHere.map((p, i) => (
-                  <circle
-                    key={p.id}
-                    cx={x + 14 + i * 16}
-                    cy={y + CARD_H - 24}
-                    r={6}
-                    fill={p.id === myPlayerId ? "#00e5ff" : "#ff2a6d"}
-                    stroke="#0a0a0c"
-                    strokeWidth={1.5}
-                  />
-                ))}
               </g>
             );
-          })}
+          })
+        )}
 
-          {/* Gradient defs */}
-          <defs>
-            <linearGradient id="cardGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#18181b" stopOpacity="0" />
-              <stop offset="100%" stopColor="#18181b" stopOpacity="0.95" />
-            </linearGradient>
-          </defs>
-        </g>
+        {/* ─── Player tokens ─── */}
+        {players.map((p, idx) => {
+          const cx = p.gridCol * CELL_PX + CELL_PX / 2;
+          const cy = p.gridRow * CELL_PX + CELL_PX / 2;
+          const color = PLAYER_COLORS[p.colorIndex % PLAYER_COLORS.length];
+          // Offset if multiple players on same cell
+          const offset = (idx % 2 === 0 ? 1 : -1) * (Math.floor(idx / 2) * 5);
+
+          return (
+            <g key={p.id} transform={`translate(${offset}, ${offset})`}>
+              {/* Glow ring for current player */}
+              {p.isMe && (
+                <circle cx={cx} cy={cy} r={13} fill="none" stroke={color} strokeWidth={2} opacity={0.5} className="animate-ping" />
+              )}
+              {/* Token circle */}
+              <circle cx={cx} cy={cy} r={11} fill={color} stroke="#0a0a0c" strokeWidth={2} />
+              {/* Player initial */}
+              <text x={cx} y={cy + 4} textAnchor="middle" fontSize="9" fontFamily="monospace" fontWeight="bold" fill="#000">
+                {p.nickname.charAt(0).toUpperCase()}
+              </text>
+            </g>
+          );
+        })}
       </svg>
-
-      {/* Zoom hint */}
-      <div className="absolute bottom-2 right-2 text-xs font-mono text-zinc-700">
-        Arraste para mover • Scroll para zoom
-      </div>
     </div>
   );
 }

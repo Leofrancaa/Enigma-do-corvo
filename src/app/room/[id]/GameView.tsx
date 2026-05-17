@@ -9,11 +9,13 @@ import { PlayersPanel } from "@/components/panels/PlayersPanel";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AlertTriangle, List, Loader2 } from "lucide-react";
-import { getReachableNodes } from "@/lib/game/rules";
-import type { LocationConnection } from "@/types/game";
+import { getReachableCells } from "@/lib/game/board";
+import type { Player } from "@/types/game";
+
+const PLAYER_COLORS_ORDER = ["#00e5ff", "#ff2a6d", "#a855f7", "#22c55e", "#f59e0b", "#3b82f6"];
 
 export function GameView() {
-  const { snapshot, setSnapshot } = useGameStore();
+  const { snapshot } = useGameStore();
   const [moving, setMoving] = useState(false);
   const [moveError, setMoveError] = useState<string | null>(null);
   const [showClues, setShowClues] = useState(false);
@@ -28,18 +30,31 @@ export function GameView() {
   const isHost = me?.isHost ?? false;
 
   const locations = snapshot.worldMap?.locations ?? [];
-  const connections = snapshot.worldMap?.connections ?? [];
 
-  // Dado: usa o do servidor (sincronizado via realtime) ou o local transitório
+  // Dado atual
   const currentDice = (room as any).currentDice ?? localDice;
 
-  // Nós alcançáveis com o dado atual
-  const reachable = useMemo(() => {
-    if (!isMyTurn || !me?.currentLocationId || !currentDice) return [];
-    return getReachableNodes(me.currentLocationId, currentDice, connections as LocationConnection[]);
-  }, [isMyTurn, me?.currentLocationId, currentDice, connections]);
+  // Células alcançáveis pelo dado
+  const reachable = useMemo((): Array<[number, number]> => {
+    if (!isMyTurn || !me || !currentDice) return [];
+    return getReachableCells(me.gridRow ?? 10, me.gridCol ?? 9, currentDice);
+  }, [isMyTurn, me?.gridRow, me?.gridCol, currentDice]);
 
-  async function handleMove(toLocationId: string) {
+  // Monta lista de dots para o mapa
+  const playerDots = room.players.map((p: Player, idx: number) => ({
+    id: p.id,
+    gridRow: p.gridRow ?? 10,
+    gridCol: p.gridCol ?? 9,
+    nickname: p.nickname,
+    colorIndex: idx,
+    isMe: p.id === me?.id,
+    avatarUrl: p.character?.avatarUrl,
+  }));
+
+  // Detecta mobile
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 1024;
+
+  async function handleCellClick(row: number, col: number) {
     if (moving) return;
     setMoving(true);
     setMoveError(null);
@@ -47,11 +62,11 @@ export function GameView() {
       const res = await fetch(`/api/rooms/${room.id}/move`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ toLocationId, clientActionId: crypto.randomUUID() }),
+        body: JSON.stringify({ toRow: row, toCol: col, clientActionId: crypto.randomUUID() }),
       });
       const data = await res.json();
       if (!res.ok) setMoveError(data.error ?? "Erro ao mover.");
-      else setLocalDice(null); // limpa dado local após mover
+      else setLocalDice(null);
     } catch {
       setMoveError("Erro de conexão.");
     } finally {
@@ -74,21 +89,20 @@ export function GameView() {
 
   return (
     <div className="flex flex-col h-dvh overflow-hidden">
-      {/* HUD top */}
-      <div className="flex items-center justify-between px-4 py-2 bg-zinc-900/80 border-b border-zinc-800 backdrop-blur-sm shrink-0">
+      {/* HUD */}
+      <div className="flex items-center justify-between px-4 py-2 bg-zinc-900/90 border-b border-zinc-800 backdrop-blur-sm shrink-0 z-10">
         <div className="flex items-center gap-3">
           <Badge variant="zinc" className="font-mono text-xs">
             Turno {room.currentTurn + 1}
           </Badge>
-          <span className="text-xs font-mono text-zinc-500 hidden sm:inline">
+          <span className="text-xs font-mono hidden sm:inline">
             {isMyTurn ? (
-              <span className="text-cyan-400">Sua vez</span>
+              <span className="text-cyan-400 font-bold">Sua vez</span>
             ) : (
-              <span>Vez de <span className="text-zinc-300">{currentPlayer?.nickname}</span></span>
+              <span className="text-zinc-500">Vez de <span className="text-zinc-300">{currentPlayer?.nickname}</span></span>
             )}
           </span>
         </div>
-
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1.5 text-xs font-mono">
             <span className="text-zinc-600">Turnos:</span>
@@ -96,16 +110,14 @@ export function GameView() {
           </div>
           <div className="flex items-center gap-1.5 text-xs font-mono">
             <AlertTriangle className="w-3 h-3 text-zinc-600" />
-            <span className={room.errorsRemaining <= 1 ? "text-red-400" : "text-zinc-300"}>
-              {room.errorsRemaining}
-            </span>
+            <span className={room.errorsRemaining <= 1 ? "text-red-400" : "text-zinc-300"}>{room.errorsRemaining}</span>
           </div>
           {isHost && (
             <Button variant="outline" size="sm" onClick={forceDeduction} disabled={forcing} className="text-xs h-7">
               {forcing ? <Loader2 className="w-3 h-3 animate-spin" /> : "Deduzir"}
             </Button>
           )}
-          <Button variant="ghost" size="icon" onClick={() => setShowClues((v) => !v)} className="h-7 w-7 text-zinc-400 hover:text-cyan-400">
+          <Button variant="ghost" size="icon" onClick={() => setShowClues(v => !v)} className="h-7 w-7 text-zinc-400">
             <List className="w-4 h-4" />
           </Button>
         </div>
@@ -113,35 +125,31 @@ export function GameView() {
 
       {/* Main layout */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Players sidebar (desktop) */}
+        {/* Sidebar esquerda (desktop) */}
         <div className="hidden lg:flex flex-col w-44 border-r border-zinc-800 shrink-0 bg-zinc-950">
           <PlayersPanel />
-
-          {/* Dado */}
-          <div className="p-4 border-t border-zinc-800 flex flex-col items-center gap-2">
+          <div className="p-4 border-t border-zinc-800 flex flex-col items-center gap-2 mt-auto">
             <DiceRoller
               roomId={room.id}
               isMyTurn={isMyTurn}
               currentDice={(room as any).currentDice ?? null}
-              onRolled={(d) => setLocalDice(d)}
+              onRolled={setLocalDice}
             />
           </div>
         </div>
 
-        {/* Map */}
-        <div className="flex-1 relative">
+        {/* Tabuleiro */}
+        <div className="flex-1 relative bg-zinc-950 flex items-center justify-center overflow-hidden">
           <MapCanvas
             locations={locations}
-            connections={connections as LocationConnection[]}
-            players={room.players}
-            myPlayerId={me?.id ?? null}
-            currentPlayerId={room.currentPlayerId}
+            players={playerDots}
             reachable={reachable}
-            onLocationClick={handleMove}
+            onCellClick={handleCellClick}
+            isMobile={isMobile}
           />
 
           {moving && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm">
+            <div className="absolute inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm z-20">
               <div className="flex items-center gap-2 bg-zinc-900 border border-cyan-400/30 rounded-sm px-4 py-2">
                 <Loader2 className="w-4 h-4 animate-spin text-cyan-400" />
                 <span className="text-xs font-mono text-zinc-300">Movendo...</span>
@@ -150,37 +158,37 @@ export function GameView() {
           )}
 
           {moveError && (
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-red-900/80 border border-red-500/40 rounded-sm px-4 py-2">
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-red-900/80 border border-red-500/40 rounded-sm px-4 py-2 z-20">
               <span className="text-xs font-mono text-red-300">{moveError}</span>
             </div>
           )}
         </div>
 
-        {/* Clues panel (desktop) */}
+        {/* Pistas (desktop) */}
         <div className="hidden lg:flex flex-col w-64 border-l border-zinc-800 shrink-0 bg-zinc-950 overflow-hidden">
           <CluesPanel />
         </div>
       </div>
 
-      {/* Mobile dado + clues */}
+      {/* Mobile barra inferior */}
       <div className="lg:hidden flex items-center justify-between px-4 py-2 bg-zinc-900 border-t border-zinc-800 shrink-0">
         <DiceRoller
           roomId={room.id}
           isMyTurn={isMyTurn}
           currentDice={(room as any).currentDice ?? null}
-          onRolled={(d) => setLocalDice(d)}
+          onRolled={setLocalDice}
         />
-        <Button variant="ghost" size="sm" onClick={() => setShowClues((v) => !v)} className="text-xs text-zinc-400">
+        <Button variant="ghost" size="sm" onClick={() => setShowClues(v => !v)} className="text-xs text-zinc-400">
           Pistas ({snapshot.discoveredClues.length})
         </Button>
       </div>
 
-      {/* Mobile clues bottom sheet */}
+      {/* Mobile clues sheet */}
       {showClues && (
         <div className="lg:hidden fixed inset-x-0 bottom-0 z-50 bg-zinc-900 border-t border-zinc-800 rounded-t-lg max-h-[60vh] flex flex-col">
           <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800">
             <span className="text-xs font-mono text-zinc-400 uppercase tracking-wider">Pistas</span>
-            <button onClick={() => setShowClues(false)} className="text-zinc-600 hover:text-zinc-300 text-xs font-mono">Fechar</button>
+            <button onClick={() => setShowClues(false)} className="text-zinc-600 text-xs font-mono">Fechar</button>
           </div>
           <div className="overflow-y-auto flex-1"><CluesPanel /></div>
         </div>

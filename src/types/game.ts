@@ -76,9 +76,9 @@ export interface Player {
   character: Character | null;
   currentLocationId: string | null;
   currentLocation: Location | null;
-  ticketsDrone: number;
-  ticketsHyperloop: number;
-  ticketsMagrail: number;
+  gridRow: number;
+  gridCol: number;
+  inLocationSlug: string | null;
   score: number;
   isHost: boolean;
   isConnected: boolean;
