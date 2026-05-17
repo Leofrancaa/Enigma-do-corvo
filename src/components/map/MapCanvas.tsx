@@ -54,7 +54,7 @@ function Arrow({ dir, cx, cy, s }: { dir: string; cx: number; cy: number; s: num
   }
 }
 
-const MIN_SCALE = 0.25, MAX_SCALE = 1.8, INITIAL_SCALE = 0.6;
+const MIN_SCALE = 0.2, MAX_SCALE = 2.0, INITIAL_SCALE = 0.45;
 
 export function MapCanvas({ locations, players, reachable, onCellClick }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);

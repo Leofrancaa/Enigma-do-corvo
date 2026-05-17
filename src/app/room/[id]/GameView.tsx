@@ -38,14 +38,14 @@ export function GameView() {
   // Células alcançáveis pelo dado
   const reachable = useMemo((): Array<[number, number]> => {
     if (!isMyTurn || !me || !currentDice) return [];
-    return getReachableCells(me.gridRow ?? 4, me.gridCol ?? 9, currentDice);
+    return getReachableCells(me.gridRow ?? 7, me.gridCol ?? 11, currentDice);
   }, [isMyTurn, me?.gridRow, me?.gridCol, currentDice]);
 
   // Monta lista de dots para o mapa
   const playerDots = room.players.map((p: Player, idx: number) => ({
     id: p.id,
-    gridRow: p.gridRow ?? 4,
-    gridCol: p.gridCol ?? 9,
+    gridRow: p.gridRow ?? 7,
+    gridCol: p.gridCol ?? 11,
     nickname: p.nickname,
     colorIndex: idx,
     isMe: p.id === me?.id,
