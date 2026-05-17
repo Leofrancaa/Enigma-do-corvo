@@ -16,10 +16,8 @@ export const metadata: Metadata = {
   title: "Cifra Urbana: O Enigma do Corvo",
   description:
     "Jogo cooperativo de dedução ambientado numa metrópole cyberpunk distópica. Desvende crimes complexos orquestrados pelo misterioso Corvo.",
-  manifest: "/manifest.json",
   icons: {
-    icon: "/icons/icon-192.png",
-    apple: "/icons/apple-touch-icon.png",
+    icon: "/favicon.ico",
   },
 };
 
