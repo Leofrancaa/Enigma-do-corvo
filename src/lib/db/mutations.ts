@@ -23,12 +23,24 @@ export async function createRoom(hostSessionId: string): Promise<{ id: string; c
         .values({ code, hostSessionId })
         .returning({ id: rooms.id, code: rooms.code });
       return room;
-    } catch {
+    } catch (err: unknown) {
+      // Só tenta novamente em violação de unique (código duplicado)
+      const isUniqueViolation =
+        err &&
+        typeof err === "object" &&
+        "code" in err &&
+        (err as { code: string }).code === "23505";
+
+      if (!isUniqueViolation) {
+        // Lança o erro real para aparecer nos logs da Vercel
+        throw err;
+      }
+
       code = generateRoomCode();
       attempts++;
     }
   }
-  throw new Error("Falha ao gerar código único para a sala.");
+  throw new Error("Falha ao gerar código único para a sala após 5 tentativas.");
 }
 
 export async function updateRoomStatus(
