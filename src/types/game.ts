@@ -37,19 +37,19 @@ export interface Character {
 
 export interface Location {
   id: string;
-  caseId: string;
+  slug: string;
   name: string;
+  subtitle: string | null;
   description: string;
   imageUrl: string | null;
+  iconUrl: string | null;
   mapX: string;
   mapY: string;
   isStartHub: boolean;
-  isSolutionWhere: boolean;
 }
 
 export interface LocationConnection {
   id: string;
-  caseId: string;
   fromId: string;
   toId: string;
   transportType: TransportType;
@@ -112,6 +112,7 @@ export interface Room {
   maxTurns: number;
   errorsRemaining: number;
   currentPlayerId: string | null;
+  currentDice: number | null;
   players: Player[];
   createdAt: string;
   startedAt: string | null;

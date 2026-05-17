@@ -8,7 +8,6 @@ import {
   rooms,
 } from "./schema";
 import { generateRoomCode } from "@/lib/utils/code-generator";
-import type { PlayerTickets } from "@/lib/game/rules";
 
 // ─── Room ─────────────────────────────────────────────────────────────────────
 
@@ -114,12 +113,8 @@ export async function updatePlayerConnection(playerId: string, isConnected: bool
     .where(eq(players.id, playerId));
 }
 
-export async function updatePlayerLocation(
-  playerId: string,
-  locationId: string,
-  tickets: PlayerTickets
-) {
-  await db.update(players).set({ currentLocationId: locationId, ...tickets }).where(eq(players.id, playerId));
+export async function updatePlayerLocation(playerId: string, locationId: string) {
+  await db.update(players).set({ currentLocationId: locationId }).where(eq(players.id, playerId));
 }
 
 export async function setPlayerCharacter(playerId: string, characterId: string) {

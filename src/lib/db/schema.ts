@@ -169,6 +169,7 @@ export const rooms = pgTable(
     maxTurns: integer("max_turns").notNull().default(20),
     errorsRemaining: integer("errors_remaining").notNull().default(3),
     currentPlayerId: uuid("current_player_id"),
+    currentDice: integer("current_dice"),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
     startedAt: timestamp("started_at", { withTimezone: true }),
     endedAt: timestamp("ended_at", { withTimezone: true }),

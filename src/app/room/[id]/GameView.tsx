@@ -3,20 +3,22 @@
 import { useState, useMemo } from "react";
 import { useGameStore } from "@/stores/useGameStore";
 import { MapCanvas } from "@/components/map/MapCanvas";
+import { DiceRoller } from "@/components/map/DiceRoller";
 import { CluesPanel } from "@/components/panels/CluesPanel";
 import { PlayersPanel } from "@/components/panels/PlayersPanel";
-import { TicketsBar } from "@/components/panels/TicketsBar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, AlertTriangle, List } from "lucide-react";
-import type { LocationConnection, TransportType } from "@/types/game";
+import { AlertTriangle, List, Loader2 } from "lucide-react";
+import { getReachableNodes } from "@/lib/game/rules";
+import type { LocationConnection } from "@/types/game";
 
 export function GameView() {
-  const { snapshot } = useGameStore();
+  const { snapshot, setSnapshot } = useGameStore();
   const [moving, setMoving] = useState(false);
   const [moveError, setMoveError] = useState<string | null>(null);
   const [showClues, setShowClues] = useState(false);
   const [forcing, setForcing] = useState(false);
+  const [localDice, setLocalDice] = useState<number | null>(null);
 
   if (!snapshot) return null;
 
@@ -28,29 +30,16 @@ export function GameView() {
   const locations = snapshot.worldMap?.locations ?? [];
   const connections = snapshot.worldMap?.connections ?? [];
 
-  // Compute reachable locations for the current player (me, on my turn)
+  // Dado: usa o do servidor (sincronizado via realtime) ou o local transitório
+  const currentDice = (room as any).currentDice ?? localDice;
+
+  // Nós alcançáveis com o dado atual
   const reachable = useMemo(() => {
-    if (!isMyTurn || !me?.currentLocationId) return [];
+    if (!isMyTurn || !me?.currentLocationId || !currentDice) return [];
+    return getReachableNodes(me.currentLocationId, currentDice, connections as LocationConnection[]);
+  }, [isMyTurn, me?.currentLocationId, currentDice, connections]);
 
-    const result: Array<{ locationId: string; transportType: TransportType }> = [];
-    const myLoc = me.currentLocationId;
-
-    for (const conn of connections as LocationConnection[]) {
-      if (conn.fromId === myLoc || conn.toId === myLoc) {
-        const targetId = conn.fromId === myLoc ? conn.toId : conn.fromId;
-        const alreadyAdded = result.find((r) => r.locationId === targetId);
-        if (!alreadyAdded) {
-          const ticketKey = `tickets${conn.transportType.charAt(0).toUpperCase()}${conn.transportType.slice(1)}` as keyof typeof me;
-          if ((me[ticketKey] as number) > 0) {
-            result.push({ locationId: targetId, transportType: conn.transportType });
-          }
-        }
-      }
-    }
-    return result;
-  }, [isMyTurn, me, connections]);
-
-  async function handleMove(toLocationId: string, transportType: TransportType) {
+  async function handleMove(toLocationId: string) {
     if (moving) return;
     setMoving(true);
     setMoveError(null);
@@ -58,14 +47,11 @@ export function GameView() {
       const res = await fetch(`/api/rooms/${room.id}/move`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          toLocationId,
-          transportType,
-          clientActionId: crypto.randomUUID(),
-        }),
+        body: JSON.stringify({ toLocationId, clientActionId: crypto.randomUUID() }),
       });
       const data = await res.json();
       if (!res.ok) setMoveError(data.error ?? "Erro ao mover.");
+      else setLocalDice(null); // limpa dado local após mover
     } catch {
       setMoveError("Erro de conexão.");
     } finally {
@@ -78,7 +64,7 @@ export function GameView() {
     try {
       await fetch(`/api/rooms/${room.id}/deduction`, { method: "POST" });
     } catch {
-      // will reflect via realtime
+      //
     } finally {
       setForcing(false);
     }
@@ -88,13 +74,13 @@ export function GameView() {
 
   return (
     <div className="flex flex-col h-dvh overflow-hidden">
-      {/* HUD top bar */}
+      {/* HUD top */}
       <div className="flex items-center justify-between px-4 py-2 bg-zinc-900/80 border-b border-zinc-800 backdrop-blur-sm shrink-0">
         <div className="flex items-center gap-3">
           <Badge variant="zinc" className="font-mono text-xs">
             Turno {room.currentTurn + 1}
           </Badge>
-          <span className="text-xs font-mono text-zinc-500 hidden sm:block">
+          <span className="text-xs font-mono text-zinc-500 hidden sm:inline">
             {isMyTurn ? (
               <span className="text-cyan-400">Sua vez</span>
             ) : (
@@ -114,25 +100,12 @@ export function GameView() {
               {room.errorsRemaining}
             </span>
           </div>
-
           {isHost && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={forceDeduction}
-              disabled={forcing}
-              className="text-xs h-7"
-            >
+            <Button variant="outline" size="sm" onClick={forceDeduction} disabled={forcing} className="text-xs h-7">
               {forcing ? <Loader2 className="w-3 h-3 animate-spin" /> : "Deduzir"}
             </Button>
           )}
-
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setShowClues((v) => !v)}
-            className="h-7 w-7 text-zinc-400 hover:text-cyan-400"
-          >
+          <Button variant="ghost" size="icon" onClick={() => setShowClues((v) => !v)} className="h-7 w-7 text-zinc-400 hover:text-cyan-400">
             <List className="w-4 h-4" />
           </Button>
         </div>
@@ -141,13 +114,18 @@ export function GameView() {
       {/* Main layout */}
       <div className="flex flex-1 overflow-hidden">
         {/* Players sidebar (desktop) */}
-        <div className="hidden lg:flex flex-col w-48 border-r border-zinc-800 shrink-0 overflow-y-auto bg-zinc-950">
+        <div className="hidden lg:flex flex-col w-44 border-r border-zinc-800 shrink-0 bg-zinc-950">
           <PlayersPanel />
-          {me && (
-            <div className="px-4 py-3 border-t border-zinc-800">
-              <TicketsBar player={me} />
-            </div>
-          )}
+
+          {/* Dado */}
+          <div className="p-4 border-t border-zinc-800 flex flex-col items-center gap-2">
+            <DiceRoller
+              roomId={room.id}
+              isMyTurn={isMyTurn}
+              currentDice={(room as any).currentDice ?? null}
+              onRolled={(d) => setLocalDice(d)}
+            />
+          </div>
         </div>
 
         {/* Map */}
@@ -179,31 +157,34 @@ export function GameView() {
         </div>
 
         {/* Clues panel (desktop) */}
-        <div className="hidden lg:flex flex-col w-64 border-l border-zinc-800 shrink-0 overflow-hidden bg-zinc-950">
+        <div className="hidden lg:flex flex-col w-64 border-l border-zinc-800 shrink-0 bg-zinc-950 overflow-hidden">
           <CluesPanel />
         </div>
       </div>
 
-      {/* Mobile: bottom sheet for clues */}
+      {/* Mobile dado + clues */}
+      <div className="lg:hidden flex items-center justify-between px-4 py-2 bg-zinc-900 border-t border-zinc-800 shrink-0">
+        <DiceRoller
+          roomId={room.id}
+          isMyTurn={isMyTurn}
+          currentDice={(room as any).currentDice ?? null}
+          onRolled={(d) => setLocalDice(d)}
+        />
+        <Button variant="ghost" size="sm" onClick={() => setShowClues((v) => !v)} className="text-xs text-zinc-400">
+          Pistas ({snapshot.discoveredClues.length})
+        </Button>
+      </div>
+
+      {/* Mobile clues bottom sheet */}
       {showClues && (
         <div className="lg:hidden fixed inset-x-0 bottom-0 z-50 bg-zinc-900 border-t border-zinc-800 rounded-t-lg max-h-[60vh] flex flex-col">
           <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800">
             <span className="text-xs font-mono text-zinc-400 uppercase tracking-wider">Pistas</span>
-            <button onClick={() => setShowClues(false)} className="text-zinc-600 hover:text-zinc-300 text-xs font-mono">
-              Fechar
-            </button>
+            <button onClick={() => setShowClues(false)} className="text-zinc-600 hover:text-zinc-300 text-xs font-mono">Fechar</button>
           </div>
-          <div className="overflow-y-auto flex-1">
-            <CluesPanel />
-          </div>
+          <div className="overflow-y-auto flex-1"><CluesPanel /></div>
         </div>
       )}
-
-      {/* Mobile bottom bar */}
-      <div className="lg:hidden flex items-center justify-between px-4 py-2 bg-zinc-900 border-t border-zinc-800 shrink-0">
-        <PlayersPanel />
-        {me && <TicketsBar player={me} />}
-      </div>
     </div>
   );
 }

@@ -1,13 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
-import { moveSchema } from "@/lib/validation/zod-schemas";
+import { z } from "zod";
 import { getSessionId } from "@/lib/session";
 import { getPlayerBySession, getLocationConnections, getUndiscoveredCluesForLocation } from "@/lib/db/queries";
-import { updatePlayerLocation, revealClues, insertPlayerAction, advanceTurn } from "@/lib/db/mutations";
+import { revealClues, insertPlayerAction, advanceTurn } from "@/lib/db/mutations";
 import { db } from "@/lib/db/client";
-import { rooms } from "@/lib/db/schema";
+import { players, rooms } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
-import { canMove, deductTicket, getNextPlayerId } from "@/lib/game/rules";
-import { assertTransition } from "@/lib/game/state-machine";
+import { canMove, getNextPlayerId } from "@/lib/game/rules";
+
+const moveSchema = z.object({
+  toLocationId: z.string().uuid(),
+  clientActionId: z.string().uuid(),
+});
 
 export async function POST(
   req: NextRequest,
@@ -16,13 +20,12 @@ export async function POST(
   try {
     const { id: roomId } = await params;
     const body = await req.json();
-    const parsed = moveSchema.safeParse({ ...body, roomId });
-
+    const parsed = moveSchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
     }
 
-    const { toLocationId, transportType, clientActionId } = parsed.data;
+    const { toLocationId, clientActionId } = parsed.data;
     const sessionId = await getSessionId();
     if (!sessionId) return NextResponse.json({ error: "Sessão não encontrada." }, { status: 401 });
 
@@ -45,8 +48,7 @@ export async function POST(
       room.currentPlayerId,
       player.currentLocationId,
       toLocationId,
-      transportType,
-      player,
+      room.currentDice,
       connections
     );
 
@@ -54,12 +56,14 @@ export async function POST(
       return NextResponse.json({ error: moveResult.reason }, { status: 400 });
     }
 
-    const newTickets = deductTicket(player, transportType);
+    // Move player and clear dice
+    await db
+      .update(players)
+      .set({ currentLocationId: toLocationId })
+      .where(eq(players.id, player.id));
 
-    // Discover undiscovered clues at the new location
+    // Reveal undiscovered clues at destination
     const undiscovered = await getUndiscoveredCluesForLocation(roomId, toLocationId, room.caseId!);
-
-    await updatePlayerLocation(player.id, toLocationId, newTickets);
     await revealClues(roomId, player.id, undiscovered.map((c) => c.id));
 
     await insertPlayerAction({
@@ -67,15 +71,19 @@ export async function POST(
       roomId,
       playerId: player.id,
       type: "move",
-      payload: { fromLocationId: player.currentLocationId, toLocationId, transportType },
+      payload: { fromLocationId: player.currentLocationId, toLocationId, dice: room.currentDice },
       turn: room.currentTurn,
     });
 
-    // Advance turn
+    // Advance turn and reset dice
     const nextPlayerId = getNextPlayerId(room.players, player.id);
     const nextTurn = room.currentTurn + 1;
+
     if (nextPlayerId) {
-      await advanceTurn(roomId, nextPlayerId, nextTurn);
+      await db
+        .update(rooms)
+        .set({ currentPlayerId: nextPlayerId, currentTurn: nextTurn, currentDice: null })
+        .where(eq(rooms.id, roomId));
     }
 
     // Check turn limit
