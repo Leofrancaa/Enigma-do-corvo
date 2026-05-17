@@ -129,6 +129,8 @@ export const cases = pgTable("cases", {
   solutionHow: text("solution_how").notNull(),
   solutionWhy: text("solution_why").notNull(),
   solutionExplanation: text("solution_explanation").notNull(),
+  // Perguntas flexíveis: [{id, label, answer}] — cada caso define as suas
+  questions: jsonb("questions").notNull().default([]),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 });
 
@@ -265,10 +267,10 @@ export const guesses = pgTable(
     playerId: uuid("player_id")
       .notNull()
       .references(() => players.id, { onDelete: "cascade" }),
-    who: text("who"),
-    whereId: uuid("where_id").references(() => locations.id),
-    how: text("how"),
-    why: text("why"),
+    // Respostas dinâmicas: { questionId: "resposta do jogador" }
+    answers: jsonb("answers").default({}),
+    correctCount: integer("correct_count").default(0),
+    totalCount: integer("total_count").default(0),
     isFinal: boolean("is_final").notNull().default(false),
     isCorrect: boolean("is_correct"),
     scoreAwarded: integer("score_awarded"),

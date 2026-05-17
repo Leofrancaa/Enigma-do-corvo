@@ -50,10 +50,7 @@ export const moveSchema = z.object({
 
 export const guessSchema = z.object({
   roomId: uuidSchema,
-  who: z.string().min(1).max(200),
-  whereId: uuidSchema,
-  how: z.string().min(1).max(200),
-  why: z.string().min(1).max(200),
+  answers: z.record(z.string(), z.string().min(1).max(300)),
   isFinal: z.boolean().default(false),
   clientActionId: uuidSchema,
 });

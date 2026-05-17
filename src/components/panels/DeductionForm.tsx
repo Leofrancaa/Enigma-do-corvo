@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { useGameStore } from "@/stores/useGameStore";
@@ -6,30 +6,29 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Loader2 } from "lucide-react";
-import type { Location } from "@/types/game";
+import type { CaseQuestion } from "@/types/game";
 
 interface Props {
   isFinal?: boolean;
-  onSuccess?: (result: { isCorrect: boolean; correctCount: number; score: number }) => void;
+  onSuccess?: (result: { correctCount: number; totalCount: number; score: number }) => void;
 }
 
 export function DeductionForm({ isFinal = false, onSuccess }: Props) {
   const { snapshot } = useGameStore();
-  const [who, setWho] = useState("");
-  const [whereId, setWhereId] = useState("");
-  const [how, setHow] = useState("");
-  const [why, setWhy] = useState("");
+  const [answers, setAnswers] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
 
   if (!snapshot) return null;
   const { room } = snapshot;
-  const locations: Location[] = snapshot.worldMap?.locations ?? [];
+  const questions: CaseQuestion[] = (room.case as any)?.questions ?? [];
+
+  const allFilled = questions.length > 0 && questions.every((q) => (answers[q.id] ?? "").trim().length > 0);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!who.trim() || !whereId || !how.trim() || !why.trim()) return;
+    if (!allFilled) return;
 
     setLoading(true);
     setError(null);
@@ -38,17 +37,14 @@ export function DeductionForm({ isFinal = false, onSuccess }: Props) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          who: who.trim(),
-          whereId,
-          how: how.trim(),
-          why: why.trim(),
+          answers,
           isFinal,
           clientActionId: crypto.randomUUID(),
         }),
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error ?? "Erro ao enviar palpite.");
+        setError(data.error ?? "Erro ao enviar dedução.");
         return;
       }
       setSubmitted(true);
@@ -62,74 +58,42 @@ export function DeductionForm({ isFinal = false, onSuccess }: Props) {
 
   if (submitted) {
     return (
-      <div className="flex items-center justify-center h-32 text-xs font-mono text-emerald-400">
-        Palpite registrado. Aguardando resolução...
+      <div className="flex items-center justify-center h-32 text-xs font-mono text-emerald-400 text-center px-4">
+        Dedução registrada. Aguardando resolução...
+      </div>
+    );
+  }
+
+  if (questions.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-32 text-xs font-mono text-zinc-600 px-4 text-center">
+        As perguntas do caso ainda não foram carregadas.
       </div>
     );
   }
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4 p-4">
-      <div className="flex items-center gap-2 mb-2">
+      <div className="flex items-center gap-2 mb-1">
         <span className="text-xs font-mono text-zinc-400 uppercase tracking-wider">
-          {isFinal ? "Palpite Final" : "Dedução Parcial"}
+          {isFinal ? "Dedução Final" : "Palpite"}
         </span>
         {isFinal && <Badge variant="magenta" className="text-xs">Final</Badge>}
       </div>
 
-      <div className="flex flex-col gap-1.5">
-        <label className="text-xs font-mono text-zinc-500 uppercase tracking-wider">
-          Quem?
-        </label>
-        <Input
-          value={who}
-          onChange={(e) => setWho(e.target.value)}
-          placeholder="Nome do suspeito..."
-          maxLength={200}
-        />
-      </div>
-
-      <div className="flex flex-col gap-1.5">
-        <label className="text-xs font-mono text-zinc-500 uppercase tracking-wider">
-          Onde?
-        </label>
-        <select
-          value={whereId}
-          onChange={(e) => setWhereId(e.target.value)}
-          className="flex h-10 w-full rounded-sm border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm font-mono text-zinc-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-amber-400 focus-visible:border-amber-400"
-        >
-          <option value="">Selecione o local...</option>
-          {locations.map((loc: Location) => (
-            <option key={loc.id} value={loc.id}>
-              {loc.name}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div className="flex flex-col gap-1.5">
-        <label className="text-xs font-mono text-zinc-500 uppercase tracking-wider">
-          Como?
-        </label>
-        <Input
-          value={how}
-          onChange={(e) => setHow(e.target.value)}
-          placeholder="Método ou arma..."
-          maxLength={200}
-        />
-      </div>
-
-      <div className="flex flex-col gap-1.5">
-        <label className="text-xs font-mono text-zinc-500 uppercase tracking-wider">
-          Por quê?
-        </label>
-        <Input
-          value={why}
-          onChange={(e) => setWhy(e.target.value)}
-          placeholder="Motivo do crime..."
-          maxLength={200}
-        />
-      </div>
+      {questions.map((q, idx) => (
+        <div key={q.id} className="flex flex-col gap-1.5">
+          <label className="text-xs font-mono text-amber-400/80 leading-snug">
+            {idx + 1}. {q.label}
+          </label>
+          <Input
+            value={answers[q.id] ?? ""}
+            onChange={(e) => setAnswers((prev) => ({ ...prev, [q.id]: e.target.value }))}
+            placeholder="Sua resposta..."
+            maxLength={300}
+          />
+        </div>
+      ))}
 
       {error && (
         <p className="text-xs font-mono text-red-400 bg-red-500/10 border border-red-500/20 rounded-sm px-3 py-2">
@@ -140,14 +104,11 @@ export function DeductionForm({ isFinal = false, onSuccess }: Props) {
       <Button
         type="submit"
         variant={isFinal ? "neon" : "secondary"}
-        disabled={loading || !who.trim() || !whereId || !how.trim() || !why.trim()}
+        disabled={loading || !allFilled}
         className="w-full"
       >
         {loading ? (
-          <>
-            <Loader2 className="w-4 h-4 animate-spin" />
-            Enviando...
-          </>
+          <><Loader2 className="w-4 h-4 animate-spin" />Enviando...</>
         ) : (
           isFinal ? "Confirmar Dedução Final" : "Enviar Palpite"
         )}
@@ -155,7 +116,7 @@ export function DeductionForm({ isFinal = false, onSuccess }: Props) {
 
       {!isFinal && (
         <p className="text-xs font-mono text-zinc-600 text-center">
-          Palpites parciais errados consomem 1 erro.
+          Palpites errados consomem 1 erro.
         </p>
       )}
     </form>

@@ -7,6 +7,12 @@
   "recommended_players_min": 3,
   "recommended_players_max": 6,
   "narrative_intro": "No coração pulsante da metrópole, a redação do jornal 'A Voz da Cidade' era um farol de verdade. Até que o farol se apagou. Arthur Penumbra, o editor-chefe conhecido por suas investigações implacáveis, foi encontrado em sua sala, a cabeça sobre a máquina de escrever antiga, um copo de uísque pela metade e um maço de cigarros amassado. O relógio de parede, um presente de sua esposa, estava parado às 03h17. A polícia local, liderada pelo Chefe Rino Pereira, rapidamente concluiu 'morte natural por exaustão'. Mas a Dra. Lupa Costa, a legista, notou algo estranho: um leve cheiro de amêndoas amargas no ar e uma pequena mancha roxa quase imperceptível no pescoço de Arthur.\n\nEm sua máquina de escrever, a última frase digitada, ainda incompleta: 'O segredo do Beco do Gato Preto está guardado por...'\n\nArthur estava investigando uma série de desaparecimentos de jovens artistas de rua, casos que a polícia parecia ignorar. Ele estava perto de desvendar algo grande, algo que alguém não queria que viesse à tona. Agora, a verdade está nas suas mãos. Quem silenciou a voz da cidade para sempre?",
+  "questions": [
+    { "id": "q1", "label": "Quem assassinou Arthur Penumbra?", "answer": "Isadora Lima" },
+    { "id": "q2", "label": "Qual foi a arma do crime?", "answer": "Cianeto de potássio injetado no pescoço via seringa" },
+    { "id": "q3", "label": "Qual foi o motivo?", "answer": "Silenciar a reportagem que exporia sua rede de tráfico" },
+    { "id": "q4", "label": "O que Isadora chefiava?", "answer": "Uma rede de tráfico de jovens artistas de rua para exploração internacional" }
+  ],
   "solution_who": "Isadora Lima",
   "solution_where_slug": "beco-gato-preto",
   "solution_how": "Asfixia por cianeto de potássio administrado via injeção rápida no pescoço, simulando um mal súbito. O cianeto foi disfarçado no uísque para mascarar o cheiro inicial.",

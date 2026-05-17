@@ -7,6 +7,12 @@
   "recommended_players_min": 2,
   "recommended_players_max": 6,
   "narrative_intro": "Roberto Caldas era o tipo de investigador que não largava um caso. Aposentado da polícia há 15 anos, ele abriu seu escritório particular no andar de cima do Café 'A Pista Quente' — e nunca parou de trabalhar.\n\nNa manhã de uma quinta-feira nublada, a atendente Sônia encontrou Roberto sentado à sua mesa de sempre. Uma xícara de café frio à sua frente. Um relógio de bolso antigo, parado às 02h47, sobre a mesa. Morto. O médico legista estimou que a morte ocorreu entre meia-noite e 3h da manhã.\n\nNo caderno aberto ao lado da xícara, a última linha que Roberto escreveu antes de morrer: 'DRUMOND ESTAVA LÁ. ELA SABE QUEM DEU O TIRO.'\n\nRoberto investigava há três meses um assassinato não resolvido de 1987 — um crime que a polícia arquivou rapidamente demais. Agora ele é a vítima.\n\nAlguém soube que ele estava chegando perto demais da verdade.\n\nCabe a vocês descobrir: o que Roberto encontrou, e quem silenciou o relógio para sempre?",
+  "questions": [
+    { "id": "q1", "label": "Quem assassinou Roberto Caldas?", "answer": "Marciana Drumond" },
+    { "id": "q2", "label": "Qual foi o método do crime?", "answer": "Arsênio dissolvido no café" },
+    { "id": "q3", "label": "Qual foi o motivo do assassinato?", "answer": "Silenciar a reabertura do caso de 1987 que a incriminaria" },
+    { "id": "q4", "label": "Qual crime Marciana cometeu em 1987?", "answer": "Mandou matar seu sócio Hélio Vasconcelos para ficar com a empresa" }
+  ],
   "solution_who": "Marciana Drumond",
   "solution_where_slug": "cafe-pista-quente",
   "solution_how": "Arsênio dissolvido no café da vítima durante um encontro noturno secreto no café, simulando morte natural por parada cardíaca",

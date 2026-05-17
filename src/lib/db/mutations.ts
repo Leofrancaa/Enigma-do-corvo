@@ -166,14 +166,13 @@ export async function insertPlayerAction(data: {
 export async function insertGuess(data: {
   roomId: string;
   playerId: string;
-  who: string;
-  whereId: string;
-  how: string;
-  why: string;
+  answers: Record<string, string>;
+  correctCount: number;
+  totalCount: number;
   isFinal: boolean;
   isCorrect: boolean;
   scoreAwarded: number;
 }) {
-  const [guess] = await db.insert(guesses).values(data).returning();
+  const [guess] = await db.insert(guesses).values(data as any).returning();
   return guess;
 }

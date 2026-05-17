@@ -86,6 +86,12 @@ export interface Player {
   joinedAt: string;
 }
 
+export interface CaseQuestion {
+  id: string;    // "q1", "q2", etc.
+  label: string; // "Quem é o assassino?"
+  // answer is server-only — NOT included in CasePublic
+}
+
 export interface CasePublic {
   id: string;
   slug: string;
@@ -94,7 +100,7 @@ export interface CasePublic {
   difficulty: Difficulty;
   maxTurns: number;
   maxErrors: number;
-  // locations and connections are world-fixed, see WorldMap
+  questions: CaseQuestion[]; // perguntas públicas sem a resposta
 }
 
 export interface WorldMap {

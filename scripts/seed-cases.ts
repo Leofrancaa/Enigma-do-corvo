@@ -19,6 +19,7 @@ interface CaseJSON {
   max_errors: number;
   recommended_players_min: number;
   recommended_players_max: number;
+  questions: Array<{ id: string; label: string; answer: string }>;
   solution_who: string;
   solution_where_slug: string;
   solution_how: string;
@@ -91,6 +92,7 @@ async function seedCases() {
           maxErrors: caseData.max_errors,
           recommendedPlayersMin: caseData.recommended_players_min,
           recommendedPlayersMax: caseData.recommended_players_max,
+          questions: (caseData.questions ?? []) as any,
           solutionWho: caseData.solution_who,
           solutionWhereId,
           solutionHow: caseData.solution_how,
@@ -109,6 +111,7 @@ async function seedCases() {
           difficulty: caseData.difficulty,
           maxTurns: caseData.max_turns,
           maxErrors: caseData.max_errors,
+          questions: (caseData.questions ?? []) as any,
           solutionWho: caseData.solution_who,
           solutionWhereId,
           solutionHow: caseData.solution_how,

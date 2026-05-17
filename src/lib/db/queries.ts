@@ -50,7 +50,8 @@ export async function getRoomSnapshot(roomId: string, sessionId: string) {
     where: eq(rooms.id, roomId),
     with: {
       case: {
-        // Omit solution fields — never sent to client
+        // Omit solution fields — never sent to client.
+        // questions is included but only {id, label} — answer is stripped below
         columns: {
           id: true,
           slug: true,
@@ -61,6 +62,7 @@ export async function getRoomSnapshot(roomId: string, sessionId: string) {
           maxErrors: true,
           recommendedPlayersMin: true,
           recommendedPlayersMax: true,
+          questions: true,
           createdAt: true,
         },
       },
@@ -96,6 +98,12 @@ export async function getRoomSnapshot(roomId: string, sessionId: string) {
       ? d.discoveredAt.toISOString()
       : String(d.discoveredAt),
   }));
+
+  // Strip answer from questions — client never receives correct answers
+  if (room.case && Array.isArray((room.case as any).questions)) {
+    (room.case as any).questions = ((room.case as any).questions as Array<{ id: string; label: string; answer?: string }>)
+      .map(({ id, label }) => ({ id, label }));
+  }
 
   return { room, worldMap, discoveredClues: flatClues, allCharacters, me };
 }
