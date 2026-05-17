@@ -75,9 +75,12 @@ export async function getRoomSnapshot(roomId: string, sessionId: string) {
   // Fixed world map — same every game
   const worldMap = await getWorldMap();
 
-  // Discovered clues for this room
+  // Pistas individuais: cada jogador só vê as pistas que ELE mesmo descobriu
+  const me = room.players.find((p) => p.sessionId === sessionId) ?? null;
   const discovered = await db.query.discoveredClues.findMany({
-    where: eq(discoveredClues.roomId, roomId),
+    where: me
+      ? and(eq(discoveredClues.roomId, roomId), eq(discoveredClues.playerId, me.id))
+      : eq(discoveredClues.roomId, roomId),
     with: { clue: true },
     orderBy: (dc, { asc }) => [asc(dc.discoveredAt)],
   });
