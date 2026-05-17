@@ -8,7 +8,7 @@ import { CluesPanel } from "@/components/panels/CluesPanel";
 import { PlayersPanel } from "@/components/panels/PlayersPanel";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { AlertTriangle, List, Loader2 } from "lucide-react";
+import { AlertTriangle, List, Loader2, BookOpen, X } from "lucide-react";
 import { getReachableCells } from "@/lib/game/board";
 import type { Player } from "@/types/game";
 
@@ -19,6 +19,7 @@ export function GameView() {
   const [moving, setMoving] = useState(false);
   const [moveError, setMoveError] = useState<string | null>(null);
   const [showClues, setShowClues] = useState(false);
+  const [showCase, setShowCase] = useState(false);
   const [forcing, setForcing] = useState(false);
   const [localDice, setLocalDice] = useState<number | null>(null);
 
@@ -114,6 +115,9 @@ export function GameView() {
               {forcing ? <Loader2 className="w-3 h-3 animate-spin" /> : "Deduzir"}
             </Button>
           )}
+          <Button variant="ghost" size="icon" onClick={() => setShowCase(true)} className="h-7 w-7 text-zinc-400" title="Reler o caso">
+            <BookOpen className="w-4 h-4" />
+          </Button>
           <Button variant="ghost" size="icon" onClick={() => setShowClues(v => !v)} className="h-7 w-7 text-zinc-400">
             <List className="w-4 h-4" />
           </Button>
@@ -178,6 +182,41 @@ export function GameView() {
           Pistas ({snapshot.discoveredClues.length})
         </Button>
       </div>
+
+      {/* Modal: Reler Caso */}
+      {showCase && room.case && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+          onClick={() => setShowCase(false)}
+        >
+          <div
+            className="relative w-full max-w-2xl max-h-[80vh] bg-zinc-900 border border-amber-500/30 rounded-sm flex flex-col overflow-hidden shadow-[0_0_40px_rgba(245,158,11,0.15)]"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-5 py-3 border-b border-zinc-800 shrink-0">
+              <div className="flex items-center gap-2">
+                <BookOpen className="w-4 h-4 text-amber-400" />
+                <span className="text-xs font-mono text-amber-400 uppercase tracking-wider">Caso em Investigação</span>
+              </div>
+              <button onClick={() => setShowCase(false)} className="text-zinc-500 hover:text-zinc-200 transition-colors">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="px-5 py-4 shrink-0 border-b border-zinc-800">
+              <h2 className="text-lg font-mono font-bold text-zinc-100">{room.case.title}</h2>
+              <p className="text-xs font-mono text-zinc-500 mt-0.5">
+                {room.case.difficulty === "facil" ? "Fácil" : room.case.difficulty === "medio" ? "Médio" : "Difícil"}
+                {" · "}{room.case.maxTurns} turnos
+              </p>
+            </div>
+            <div className="overflow-y-auto px-5 py-4 flex-1">
+              <p className="text-sm font-mono text-zinc-300 leading-relaxed whitespace-pre-line">
+                {room.case.narrativeIntro}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Mobile clues sheet */}
       {showClues && (

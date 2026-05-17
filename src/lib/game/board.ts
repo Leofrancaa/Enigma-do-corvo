@@ -2,19 +2,16 @@
  * Tabuleiro 2D — 20 colunas × 15 linhas
  *
  * Tipos de célula:
- * -1 = parede (não navegável)
- *  0 = caminho
- * 10..16 = interior de local
- * 20..26 = entrada de local (seta)
+ * -1 = parede  |  0 = caminho  |  10-16 = sala  |  20-26 = entrada de sala
  *
  * Locais:
- * 10 = laboratorio-forense  | 20 = entrada (cima)
- * 11 = parque-oasis-verde   | 21 = entrada (cima)
- * 12 = beco-gato-preto      | 22 = entrada (cima)
- * 13 = cafe-pista-quente    | 23 = entrada (direita)
- * 14 = biblioteca-publica   | 24 = entrada (cima)
- * 15 = armazem-portuario    | 25 = entrada (esquerda)
- * 16 = delegacia-central    | 26 = entrada (baixo)
+ * 10 = laboratorio-forense   20 = entrada
+ * 11 = parque-oasis-verde    21 = entrada
+ * 12 = beco-gato-preto       22 = entrada
+ * 13 = cafe-pista-quente     23 = entrada
+ * 14 = biblioteca-publica    24 = entrada
+ * 15 = armazem-portuario     25 = entrada
+ * 16 = delegacia-central     26 = entrada
  */
 
 export const BOARD_ROWS = 15;
@@ -41,26 +38,16 @@ export const ENTRY_CODE_TO_SLUG: Record<number, string> = {
   26: "delegacia-central",
 };
 
-export const ENTRY_DIRECTION: Record<number, "up" | "down" | "left" | "right"> = {
-  20: "up",
-  21: "up",
-  22: "up",
-  23: "right",
-  24: "up",
-  25: "left",
-  26: "down",
-};
-
-// Retângulos de imagem: [rowStart, rowEnd, colStart, colEnd]
-// Corrigidos para coincidir com as células reais de cada sala
+// Retângulos das IMAGENS: apenas onde estão as células de sala (10-16),
+// NÃO incluem células de entrada (20-26) — entradas ficam fora das imagens.
 export const ROOM_RECTS: Record<string, [number, number, number, number]> = {
   "laboratorio-forense": [0, 2, 2, 5],
   "parque-oasis-verde":  [0, 2, 7, 11],
   "beco-gato-preto":     [0, 2, 14, 17],
-  "cafe-pista-quente":   [6, 10, 0, 2],
-  "biblioteca-publica":  [6, 10, 7, 12],
-  "armazem-portuario":   [6, 10, 16, 18],
-  "delegacia-central":   [12, 14, 6, 13],
+  "cafe-pista-quente":   [6, 10, 0, 2],    // entradas no col 3 (fora)
+  "biblioteca-publica":  [6, 9, 7, 12],    // entradas na row 10 (fora, abaixo)
+  "armazem-portuario":   [6, 10, 17, 18],  // entradas no col 16 (fora)
+  "delegacia-central":   [13, 14, 6, 13],  // entradas na row 12 e col 5/14 (fora)
 };
 
 // Todos os jogadores iniciam no mesmo ponto — corredor central acima da Delegacia
@@ -72,7 +59,6 @@ export const CHARACTER_START: Record<string, [number, number]> = {
   "pixel-mendes":  [11, 9],
   "rino-pereira":  [11, 9],
 };
-
 export const DEFAULT_START: [number, number] = [11, 9];
 
 // ─── Grade do tabuleiro ─────────────────────────────────────────────────────
@@ -81,21 +67,21 @@ const P = 0;
 
 export const BOARD_GRID: number[][] = [
   //  0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18  19
-  [ W,  W, 10, 10, 10, 10,  W, 11, 11, 11, 11, 11,  W,  W, 12, 12, 12, 12,  W,  W], // 0
-  [ W,  W, 10, 10, 10, 10,  W, 11, 11, 11, 11, 11,  W,  W, 12, 12, 12, 12,  W,  W], // 1
-  [ W,  W, 10, 10, 10, 10,  W, 11, 11, 11, 11, 11,  W,  W, 12, 12, 12, 12,  W,  W], // 2
+  [ P,  P, 10, 10, 10, 10,  W, 11, 11, 11, 11, 11,  W,  W, 12, 12, 12, 12,  P,  P], // 0
+  [ P,  P, 10, 10, 10, 10,  W, 11, 11, 11, 11, 11,  W,  W, 12, 12, 12, 12,  P,  P], // 1
+  [ P,  P, 10, 10, 10, 10,  W, 11, 11, 11, 11, 11,  W,  W, 12, 12, 12, 12,  P,  P], // 2
   [ P, 20, 20,  P,  P,  P,  P, 21, 21,  P, 21, 21,  P,  P,  P, 22, 22,  P,  P,  P], // 3
   [ P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P], // 4
-  [ P,  W,  W,  W,  P,  P,  P,  W,  W,  W,  W,  W,  W,  P,  P,  P,  W,  W,  W,  P], // 5
+  [ P,  P,  W,  W,  P,  P,  P,  W,  W,  W,  W,  W,  W,  P,  P,  P,  W,  W,  P,  P], // 5
   [13, 13, 13, 23,  P,  P,  W, 14, 14, 14, 14, 14, 14,  W,  P,  P, 25, 15, 15,  P], // 6  cafe=1, armazem=1
   [13, 13, 13,  W,  P,  P,  W, 14, 14, 14, 14, 14, 14,  W,  P,  P,  W, 15, 15,  P], // 7
   [13, 13, 13,  W,  P,  P,  W, 14, 14, 14, 14, 14, 14,  W,  P,  P,  W, 15, 15,  P], // 8
   [13, 13, 13, 23,  P,  P,  W, 14, 14, 14, 14, 14, 14,  W,  P,  P, 25, 15, 15,  P], // 9  cafe=2, armazem=2
-  [13, 13, 13,  W,  P,  P,  P, 24, 24, 24, 24,  P,  P,  P,  P,  P,  W, 15, 15,  P], // 10 biblioteca=4
-  [ P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P], // 11 ← corredor (start)
-  [ W,  W,  W,  W,  W,  P,  W, 26, 26,  P, 26, 26,  W,  W,  P,  W,  W,  W,  W,  W], // 12 delegacia=4
-  [ W,  W,  W,  W,  W,  P, 16, 16, 16, 16, 16, 16, 16, 16,  P,  W,  W,  W,  W,  W], // 13
-  [ W,  W,  W,  W,  W,  P, 16, 16, 16, 16, 16, 16, 16, 16,  P,  W,  W,  W,  W,  W], // 14
+  [13, 13, 13,  W,  P,  P,  P, 24, 24, 24, 24,  P,  P,  P,  P,  P,  W, 15, 15,  P], // 10 biblioteca=4 (abaixo)
+  [ P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P], // 11 corredor (start)
+  [ P,  P,  P,  P,  P,  P,  W, 26,  W,  P,  W, 26,  W,  W,  P,  P,  P,  P,  P,  P], // 12 delegacia=2 (cima)
+  [ P,  P,  P,  P,  P, 26, 16, 16, 16, 16, 16, 16, 16, 16, 26,  P,  P,  P,  P,  P], // 13 delegacia=2 (lados)
+  [ P,  P,  P,  P,  P,  P, 16, 16, 16, 16, 16, 16, 16, 16,  P,  P,  P,  P,  P,  P], // 14
 ];
 
 // ─── Utilitários ─────────────────────────────────────────────────────────────
@@ -146,7 +132,6 @@ export function getReachableCells(
   while (queue.length > 0) {
     const cur = queue.shift()!;
     if (cur.steps >= maxSteps) continue;
-
     for (const [nr, nc] of navigableNeighbors(cur.row, cur.col)) {
       const key = `${nr},${nc}`;
       if (!visited.has(key)) {
@@ -156,7 +141,6 @@ export function getReachableCells(
       }
     }
   }
-
   return reachable;
 }
 
