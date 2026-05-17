@@ -91,6 +91,10 @@ export interface CasePublic {
   difficulty: Difficulty;
   maxTurns: number;
   maxErrors: number;
+  // locations and connections are world-fixed, see WorldMap
+}
+
+export interface WorldMap {
   locations: Location[];
   connections: LocationConnection[];
 }
@@ -109,11 +113,14 @@ export interface Room {
   createdAt: string;
   startedAt: string | null;
   endedAt: string | null;
+  hostSessionId?: string;
 }
 
 export interface GameSnapshot {
   room: Room;
+  worldMap: WorldMap;
   discoveredClues: Clue[];
+  allCharacters?: Character[];
   me: Player | null;
 }
 

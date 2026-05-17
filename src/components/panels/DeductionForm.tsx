@@ -25,7 +25,7 @@ export function DeductionForm({ isFinal = false, onSuccess }: Props) {
 
   if (!snapshot) return null;
   const { room } = snapshot;
-  const locations: Location[] = room.case?.locations ?? [];
+  const locations: Location[] = snapshot.worldMap?.locations ?? [];
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

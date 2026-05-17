@@ -25,8 +25,8 @@ export function GameView() {
   const currentPlayer = room.players.find((p) => p.id === room.currentPlayerId);
   const isHost = me?.isHost ?? false;
 
-  const locations = room.case?.locations ?? [];
-  const connections = room.case?.connections ?? [];
+  const locations = snapshot.worldMap?.locations ?? [];
+  const connections = snapshot.worldMap?.connections ?? [];
 
   // Compute reachable locations for the current player (me, on my turn)
   const reachable = useMemo(() => {

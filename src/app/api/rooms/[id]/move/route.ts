@@ -38,7 +38,7 @@ export async function POST(
     const player = await getPlayerBySession(roomId, sessionId);
     if (!player) return NextResponse.json({ error: "Jogador não encontrado." }, { status: 403 });
 
-    const connections = await getLocationConnections(room.caseId!);
+    const connections = await getLocationConnections();
 
     const moveResult = canMove(
       player.id,

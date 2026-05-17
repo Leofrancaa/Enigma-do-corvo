@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSessionId } from "@/lib/session";
-import { getPlayerBySession, getCaseWithLocations } from "@/lib/db/queries";
+import { getPlayerBySession, getStartHub } from "@/lib/db/queries";
 import { db } from "@/lib/db/client";
 import { rooms, players } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
@@ -25,9 +25,8 @@ export async function POST(
 
     assertTransition(room.status, "INVESTIGATION");
 
-    // Set start hub location for all players
-    const caseData = await getCaseWithLocations(room.caseId!);
-    const hub = caseData?.locations.find((l) => l.isStartHub);
+    // Set start hub location for all players (world-fixed)
+    const hub = await getStartHub();
 
     if (hub) {
       const roomPlayers = await db.select().from(players).where(eq(players.roomId, roomId));

@@ -7,10 +7,25 @@ import {
   discoveredClues,
   locationConnections,
   locations,
-  playerActions,
   players,
   rooms,
 } from "./schema";
+
+// ─── World Map (fixed, same for every game) ──────────────────────────────────
+
+export async function getWorldMap() {
+  const locs = await db.select().from(locations);
+  const conns = await db.select().from(locationConnections);
+  return { locations: locs, connections: conns };
+}
+
+export async function getStartHub() {
+  return db.query.locations.findFirst({
+    where: eq(locations.isStartHub, true),
+  });
+}
+
+// ─── Rooms ────────────────────────────────────────────────────────────────────
 
 export async function getRoomByCode(code: string) {
   return db.query.rooms.findFirst({
@@ -22,12 +37,7 @@ export async function getRoomById(roomId: string) {
   return db.query.rooms.findFirst({
     where: eq(rooms.id, roomId),
     with: {
-      case: {
-        with: {
-          locations: true,
-          connections: true,
-        },
-      },
+      case: true,
       players: {
         with: { character: true, currentLocation: true },
       },
@@ -40,6 +50,7 @@ export async function getRoomSnapshot(roomId: string, sessionId: string) {
     where: eq(rooms.id, roomId),
     with: {
       case: {
+        // Omit solution fields — never sent to client
         columns: {
           id: true,
           slug: true,
@@ -48,11 +59,9 @@ export async function getRoomSnapshot(roomId: string, sessionId: string) {
           difficulty: true,
           maxTurns: true,
           maxErrors: true,
-          // solution fields intentionally omitted
-        },
-        with: {
-          locations: true,
-          connections: true,
+          recommendedPlayersMin: true,
+          recommendedPlayersMax: true,
+          createdAt: true,
         },
       },
       players: {
@@ -63,20 +72,25 @@ export async function getRoomSnapshot(roomId: string, sessionId: string) {
 
   if (!room) return null;
 
-  // Discovered clues visible to everyone in the room
+  // Fixed world map — same every game
+  const worldMap = await getWorldMap();
+
+  // Discovered clues for this room
   const discovered = await db.query.discoveredClues.findMany({
     where: eq(discoveredClues.roomId, roomId),
     with: { clue: true },
+    orderBy: (dc, { asc }) => [asc(dc.discoveredAt)],
   });
 
-  // All characters (for character select)
+  // All characters (for character select UI)
   const allCharacters = await db.select().from(characters).orderBy(characters.name);
 
-  // My player record
   const me = room.players.find((p) => p.sessionId === sessionId) ?? null;
 
-  return { room, discoveredClues: discovered, allCharacters, me };
+  return { room, worldMap, discoveredClues: discovered, allCharacters, me };
 }
+
+// ─── Players ──────────────────────────────────────────────────────────────────
 
 export async function getPlayerBySession(roomId: string, sessionId: string) {
   return db.query.players.findFirst({
@@ -84,9 +98,13 @@ export async function getPlayerBySession(roomId: string, sessionId: string) {
   });
 }
 
+// ─── Characters ───────────────────────────────────────────────────────────────
+
 export async function getAllCharacters() {
   return db.select().from(characters).orderBy(characters.name);
 }
+
+// ─── Cases ────────────────────────────────────────────────────────────────────
 
 export async function getAvailableCases() {
   return db
@@ -102,31 +120,11 @@ export async function getAvailableCases() {
     .from(cases);
 }
 
-export async function getCaseWithLocations(caseId: string) {
-  return db.query.cases.findFirst({
-    where: eq(cases.id, caseId),
-    with: {
-      locations: true,
-      connections: true,
-    },
-  });
-}
+// ─── Clues ────────────────────────────────────────────────────────────────────
 
-export async function getCluesForRoom(roomId: string) {
-  // Only return clues discovered in this room
-  const discovered = await db.query.discoveredClues.findMany({
-    where: eq(discoveredClues.roomId, roomId),
-    with: { clue: true },
-    orderBy: (dc, { asc }) => [asc(dc.discoveredAt)],
-  });
-  return discovered.map((d) => ({ ...d.clue, discoveredAt: d.discoveredAt }));
-}
-
-export async function getLocationConnections(caseId: string) {
-  return db
-    .select()
-    .from(locationConnections)
-    .where(eq(locationConnections.caseId, caseId));
+/** All connections (world-fixed, no caseId filter needed) */
+export async function getLocationConnections() {
+  return db.select().from(locationConnections);
 }
 
 export async function getUndiscoveredCluesForLocation(
@@ -158,6 +156,8 @@ export async function getUndiscoveredCluesForLocation(
   return allClues.filter((c) => !discoveredIds.has(c.id));
 }
 
+// ─── Solution (server-only — never call from client route without auth) ───────
+
 export async function getCaseSolution(caseId: string) {
   const result = await db
     .select({
@@ -165,6 +165,7 @@ export async function getCaseSolution(caseId: string) {
       solutionHow: cases.solutionHow,
       solutionWhy: cases.solutionWhy,
       solutionExplanation: cases.solutionExplanation,
+      solutionWhereId: cases.solutionWhereId,
     })
     .from(cases)
     .where(eq(cases.id, caseId))
@@ -173,7 +174,12 @@ export async function getCaseSolution(caseId: string) {
 }
 
 export async function getSolutionLocation(caseId: string) {
+  const cs = await db.query.cases.findFirst({
+    where: eq(cases.id, caseId),
+    columns: { solutionWhereId: true },
+  });
+  if (!cs?.solutionWhereId) return null;
   return db.query.locations.findFirst({
-    where: and(eq(locations.caseId, caseId), eq(locations.isSolutionWhere, true)),
+    where: eq(locations.id, cs.solutionWhereId),
   });
 }
