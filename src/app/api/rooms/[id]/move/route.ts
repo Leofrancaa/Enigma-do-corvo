@@ -50,7 +50,7 @@ export async function POST(
     }
 
     // Validate destination is reachable
-    const reachable = getReachableCells(player.gridRow ?? 10, player.gridCol ?? 9, room.currentDice);
+    const reachable = getReachableCells(player.gridRow ?? 4, player.gridCol ?? 9, room.currentDice);
     const isReachable = reachable.some(([r, c]) => r === toRow && c === toCol);
     if (!isReachable) {
       return NextResponse.json({ error: "Destino fora do alcance do dado." }, { status: 400 });

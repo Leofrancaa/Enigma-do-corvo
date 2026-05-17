@@ -1,25 +1,14 @@
 /**
- * Tabuleiro 2D — 20 colunas × 15 linhas
- * CELL_PX = 60px por célula
+ * Tabuleiro 2D — 20 colunas × 15 linhas, CELL_PX = 120px
  *
- * Tipos:
- *  0 = caminho (walkable)
+ *  0 = caminho walkable
  * 10-16 = sala (não walkable, exibe imagem)
- * 20-26 = entrada de sala (walkable, seta)
- *
- * Locais:
- * 10 = laboratorio-forense   20 = entrada
- * 11 = parque-oasis-verde    21 = entrada
- * 12 = beco-gato-preto       22 = entrada
- * 13 = cafe-pista-quente     23 = entrada
- * 14 = biblioteca-publica    24 = entrada
- * 15 = armazem-portuario     25 = entrada
- * 16 = delegacia-central     26 = entrada
+ * 20-26 = entrada de sala (walkable, seta amber)
  */
 
 export const BOARD_ROWS = 15;
 export const BOARD_COLS = 20;
-export const CELL_PX = 60;
+export const CELL_PX = 120;
 
 export const ROOM_CODE_TO_SLUG: Record<number, string> = {
   10: "laboratorio-forense",
@@ -41,8 +30,7 @@ export const ENTRY_CODE_TO_SLUG: Record<number, string> = {
   26: "delegacia-central",
 };
 
-// Retângulos das IMAGENS — só cobre células de sala (10-16)
-// Entradas ficam FORA destes retângulos
+// Retângulos das imagens: só células de sala, NUNCA inclui células de entrada
 export const ROOM_RECTS: Record<string, [number, number, number, number]> = {
   "laboratorio-forense": [0, 2, 2, 5],
   "parque-oasis-verde":  [0, 2, 7, 11],
@@ -53,37 +41,36 @@ export const ROOM_RECTS: Record<string, [number, number, number, number]> = {
   "delegacia-central":   [13, 14, 6, 13],
 };
 
-// Todos iniciam no mesmo ponto — corredor central
+// Ponto de partida único — corredor central, longe de todas as entradas
 export const CHARACTER_START: Record<string, [number, number]> = {
-  "faro-silva":    [11, 9],
-  "lupa-costa":    [11, 9],
-  "flash-santos":  [11, 9],
-  "sussurro-lima": [11, 9],
-  "pixel-mendes":  [11, 9],
-  "rino-pereira":  [11, 9],
+  "faro-silva":    [4, 9],
+  "lupa-costa":    [4, 9],
+  "flash-santos":  [4, 9],
+  "sussurro-lima": [4, 9],
+  "pixel-mendes":  [4, 9],
+  "rino-pereira":  [4, 9],
 };
-export const DEFAULT_START: [number, number] = [11, 9];
+export const DEFAULT_START: [number, number] = [4, 9];
 
-// ─── Grade — tudo walkable exceto salas ──────────────────────────────────────
-// Sem paredes (-1): qualquer célula não-sala é caminho
-const P = 0; // caminho
+const P = 0;
 
+// Tudo walkable — sem paredes. Cada célula fora de sala é caminho livre.
 export const BOARD_GRID: number[][] = [
   //  0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18  19
   [ P,  P, 10, 10, 10, 10,  P, 11, 11, 11, 11, 11,  P,  P, 12, 12, 12, 12,  P,  P], // 0
   [ P,  P, 10, 10, 10, 10,  P, 11, 11, 11, 11, 11,  P,  P, 12, 12, 12, 12,  P,  P], // 1
   [ P,  P, 10, 10, 10, 10,  P, 11, 11, 11, 11, 11,  P,  P, 12, 12, 12, 12,  P,  P], // 2
-  [ P, 20, 20,  P,  P,  P,  P, 21, 21,  P, 21, 21,  P,  P,  P, 22, 22,  P,  P,  P], // 3
-  [ P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P], // 4
+  [ P, 20, 20,  P,  P,  P,  P, 21, 21,  P, 21, 21,  P,  P,  P, 22, 22,  P,  P,  P], // 3 entradas topo
+  [ P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P], // 4 ← START
   [ P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P], // 5
-  [13, 13, 13, 23,  P,  P,  P, 14, 14, 14, 14, 14, 14,  P,  P,  P, 25, 15, 15,  P], // 6
-  [13, 13, 13,  P,  P,  P,  P, 14, 14, 14, 14, 14, 14,  P,  P,  P,  P, 15, 15,  P], // 7
+  [13, 13, 13, 23,  P,  P, 24, 14, 14, 14, 14, 14, 14, 24,  P,  P, 25, 15, 15,  P], // 6  bibl.left bibl.right
+  [13, 13, 13,  P,  P,  P, 24, 14, 14, 14, 14, 14, 14, 24,  P,  P,  P, 15, 15,  P], // 7  cafe=1 armazem=1
   [13, 13, 13,  P,  P,  P,  P, 14, 14, 14, 14, 14, 14,  P,  P,  P,  P, 15, 15,  P], // 8
-  [13, 13, 13, 23,  P,  P,  P, 14, 14, 14, 14, 14, 14,  P,  P,  P, 25, 15, 15,  P], // 9
-  [13, 13, 13,  P,  P,  P,  P, 24, 24, 24, 24,  P,  P,  P,  P,  P,  P, 15, 15,  P], // 10
-  [ P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P], // 11 ← start
-  [ P,  P,  P,  P,  P,  P,  P, 26,  P,  P,  P, 26,  P,  P,  P,  P,  P,  P,  P,  P], // 12 delegacia top=2
-  [ P,  P,  P,  P,  P, 26, 16, 16, 16, 16, 16, 16, 16, 16, 26,  P,  P,  P,  P,  P], // 13 lados=2
+  [13, 13, 13, 23,  P,  P,  P, 14, 14, 14, 14, 14, 14,  P,  P,  P, 25, 15, 15,  P], // 9  cafe=2 armazem=2
+  [13, 13, 13,  P,  P,  P,  P, 24, 24, 24, 24,  P,  P,  P,  P,  P,  P, 15, 15,  P], // 10 bibl.bottom×4
+  [ P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P,  P], // 11
+  [ P,  P,  P,  P,  P,  P,  P, 26,  P,  P,  P, 26,  P,  P,  P,  P,  P,  P,  P,  P], // 12 delegacia topo=2
+  [ P,  P,  P,  P,  P, 26, 16, 16, 16, 16, 16, 16, 16, 16, 26,  P,  P,  P,  P,  P], // 13 delegacia lados=2
   [ P,  P,  P,  P,  P,  P, 16, 16, 16, 16, 16, 16, 16, 16,  P,  P,  P,  P,  P,  P], // 14
 ];
 
