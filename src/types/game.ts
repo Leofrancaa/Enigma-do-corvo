@@ -26,8 +26,11 @@ export interface Character {
   id: string;
   name: string;
   slug: string;
+  codename: string;
+  specialty: string;
+  personality: string;
   description: string;
-  loreShort: string;
+  loreShort?: string;
   avatarUrl: string | null;
   portraitUrl: string | null;
 }
