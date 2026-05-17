@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -62,7 +62,7 @@ export function DiceRoller({ roomId, isMyTurn, currentDice, onRolled }: Props) {
         className={[
           "text-6xl select-none transition-transform",
           rolling ? "animate-bounce" : "",
-          displayDice ? "text-cyan-400" : "text-zinc-600",
+          displayDice ? "text-amber-400" : "text-zinc-600",
         ].join(" ")}
         style={{ lineHeight: 1, fontFamily: "monospace" }}
       >
@@ -70,7 +70,7 @@ export function DiceRoller({ roomId, isMyTurn, currentDice, onRolled }: Props) {
       </div>
 
       {displayDice && (
-        <p className="text-xs font-mono text-cyan-400 font-bold tracking-widest">
+        <p className="text-xs font-mono text-amber-400 font-bold tracking-widest">
           {currentDice ? `MOVA ATÉ ${currentDice} CASAS` : ""}
         </p>
       )}

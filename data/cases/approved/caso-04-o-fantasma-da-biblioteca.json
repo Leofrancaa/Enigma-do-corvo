@@ -1,0 +1,73 @@
+{
+  "slug": "o-fantasma-da-biblioteca",
+  "title": "O Fantasma da Biblioteca",
+  "difficulty": "medio",
+  "max_turns": 28,
+  "max_errors": 5,
+  "recommended_players_min": 3,
+  "recommended_players_max": 6,
+  "narrative_intro": "A Biblioteca Pública, um santuário de conhecimento, foi palco de um mistério que desafia a lógica. A bibliotecária-chefe, Sra. Elara Vance, uma mulher metódica e apaixonada por livros raros, desapareceu sem deixar vestígios. A única pista: um livro de contos de fadas antigos, aberto na página de um conto sobre um 'fantasma que rouba memórias', e uma mancha de tinta fresca em uma estante que deveria estar intocada há anos.\n\nO Detetive Faro Silva, ao chegar à cena, notou que nada parecia ter sido roubado, mas a atmosfera era de um silêncio pesado, quase opressor. A Dra. Lupa Costa encontrou um fio de cabelo incomum preso entre as páginas do livro, e o Analista de TI Pixel Mendes detectou uma breve, mas intensa, atividade de rede no servidor da biblioteca na hora do desaparecimento, vinda de um IP desconhecido.\n\nElara Vance estava catalogando uma coleção recém-adquirida de diários de um famoso historiador local, conhecido por desvendar segredos antigos da cidade. Alguém não queria que esses segredos viessem à luz. Onde está Elara Vance? Quem a levou? E qual o segredo que ela estava prestes a descobrir?",
+  "solution_who": "Professor Valdecir Lima",
+  "solution_where_slug": "armazem-portuario",
+  "solution_how": "Sequestro: Elara Vance foi atraída para uma área isolada da biblioteca, sedada com um sedativo líquido injetado via caneta especial e levada para o Armazém Portuário para ser mantida incomunicável.",
+  "solution_why": "Elara Vance estava prestes a descobrir a localização de documentos históricos que revelariam a verdadeira origem de uma organização criminosa que opera na cidade há décadas. O Professor Valdecir Lima, um agente infiltrado dessa organização, foi encarregado de silenciá-la antes que ela publicasse a descoberta.",
+  "solution_explanation": "O Professor Valdecir Lima, disfarçado de pesquisador de história local, se aproximou de Elara Vance quando soube que ela estava catalogando os diários do historiador. Quando Elara estava perto de decifrar a localização dos documentos comprometedores, Lima a atraiu para uma área remota da biblioteca usando a promessa de acesso a um 'acervo secreto'. Lá, usou uma caneta especial com sedativo para neutralizá-la e a transportou para o Armazém Portuário em um veículo de entrega de livros — câmeras do parque capturam o veículo passando. A mancha de tinta na estante era do sedativo da caneta. O fio de cabelo pertencia a Lima. O IP desconhecido era de um dispositivo de interferência de sinal.",
+  "clues": [
+    {
+      "location_slug": "biblioteca-publica",
+      "type": "evidencia",
+      "display_content": "Na estante onde Elara trabalhava, um livro de contos de fadas está aberto na página de um conto sobre um 'fantasma que rouba memórias'. Ao lado, uma mancha de tinta azul-escura, ainda fresca, que não corresponde a nenhuma caneta do acervo. O Analista de TI Pixel Mendes encontra um registro de acesso incomum no servidor: um IP mascarado que acessou os arquivos de segurança por exatamente 3 minutos na hora do desaparecimento.",
+      "decoded_hint": null,
+      "reveals_field": "context",
+      "order": 1
+    },
+    {
+      "location_slug": "laboratorio-forense",
+      "type": "evidencia",
+      "display_content": "A Dra. Lupa Costa analisa o fio de cabelo encontrado entre as páginas do livro: 'Cabelo masculino, com traços de um produto químico utilizado em sedativos de contato. Não pertence a Elara Vance. A mancha de tinta da estante também não é tinta comum — é um sedativo líquido de ação rápida absorvível pela pele, administrado por uma caneta especial.'",
+      "decoded_hint": null,
+      "reveals_field": "how",
+      "order": 1
+    },
+    {
+      "location_slug": "cafe-pista-quente",
+      "type": "depoimento",
+      "display_content": "A garçonete do Café lembra de Elara Vance conversando animadamente com um homem alto, de óculos, que se apresentou como 'Professor Lima'. 'Ele parecia muito interessado nos livros antigos que ela estava catalogando. Falava sobre segredos esquecidos e história oculta. Eles marcaram de se encontrar na biblioteca mais tarde naquele dia.'",
+      "decoded_hint": null,
+      "reveals_field": "who",
+      "order": 1
+    },
+    {
+      "location_slug": "parque-oasis-verde",
+      "type": "anagrama",
+      "display_content": "Uma câmera de segurança do parque captura um veículo de entrega de livros passando às 23h45 do dia do desaparecimento. Na lateral do veículo, um adesivo com o texto embaralhado: 'ARCIVAL DE LIVROS MIZAL'. O detetive Faro nota que algo está errado com esse nome.",
+      "decoded_hint": "'ARCIVAL DE LIVROS MIZAL' — reorganizando as letras de 'MIZAL': anagrama de 'LIMA'. E 'ARCIVAL' pode ser reorganizado como 'VALDECIR'. O nome completo do suspeito: VALDECIR LIMA.",
+      "reveals_field": "who",
+      "order": 1
+    },
+    {
+      "location_slug": "delegacia-central",
+      "type": "cifra",
+      "display_content": "Nos arquivos da Delegacia Central, relatórios antigos sobre desaparecimentos de pesquisadores nas décadas de 1990 e 2000. Todos tinham algo em comum: estavam investigando a mesma organização. Uma anotação à margem em código: 'O OPERADOR DESTA CÉLULA: V-1 L-2 D-3 E-4 C-5 I-6 R-7'. A chave: cada número indica a posição da letra no nome do operador.",
+      "decoded_hint": "Lendo as letras em sequência pela posição: V(1), L(2), D(3), E(4), C(5), I(6), R(7) = VALDECIR. O nome do operador infiltrado é Valdecir (Lima).",
+      "reveals_field": "who",
+      "order": 1
+    },
+    {
+      "location_slug": "armazem-portuario",
+      "type": "plot_twist",
+      "display_content": "Dentro de um contêiner trancado com um cadeado industrial — a combinação estava cifrada nos diários de Elara — encontra-se a própria Elara Vance, sedada mas viva, com uma câmera filmando tudo ao redor. No chão, o diário dela, última entrada: 'O Professor Lima me convidou para ver um acervo secreto. Algo não está certo. Ele mencionou uma organização... e meu nome em uma lista. Se alguém encontrar isto: Valdecir Lima. Armazém. Ajuda.'",
+      "decoded_hint": null,
+      "reveals_field": "context",
+      "order": 1
+    },
+    {
+      "location_slug": "beco-gato-preto",
+      "type": "referencia",
+      "display_content": "Em um grafite recém-feito no beco, a imagem de um corvo com um envelope no bico. Moradores locais contam que um homem alto, de óculos, passou pelo beco na noite do desaparecimento, entrando e saindo de um armazém próximo ao porto. Um deles anotou no celular: 'Homem suspeito — Prof. Lima — vai pro porto toda semana às 23h'.",
+      "decoded_hint": null,
+      "reveals_field": "why",
+      "order": 1
+    }
+  ]
+}

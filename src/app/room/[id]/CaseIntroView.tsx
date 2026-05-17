@@ -41,7 +41,7 @@ export function CaseIntroView() {
 
   return (
     <main className="relative flex flex-col items-center justify-start min-h-dvh px-6 py-10 scanlines overflow-y-auto">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(0,229,255,0.03)_0%,transparent_60%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(245,158,11,0.03)_0%,transparent_60%)]" />
 
       <div className="relative z-10 w-full max-w-2xl flex flex-col gap-8">
         {/* Case header */}
@@ -79,8 +79,8 @@ export function CaseIntroView() {
         )}
 
         {/* Objective */}
-        <div className="flex flex-col gap-3 bg-zinc-900 border border-cyan-400/20 rounded-sm p-4">
-          <p className="text-xs font-mono text-cyan-400 uppercase tracking-wider">Objetivo</p>
+        <div className="flex flex-col gap-3 bg-zinc-900 border border-amber-400/20 rounded-sm p-4">
+          <p className="text-xs font-mono text-amber-400 uppercase tracking-wider">Objetivo</p>
           <div className="grid grid-cols-2 gap-2 text-xs font-mono">
             {["Quem?", "Onde?", "Como?", "Por quê?"].map((q) => (
               <div key={q} className="flex items-center gap-2 text-zinc-500">

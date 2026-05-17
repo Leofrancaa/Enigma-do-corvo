@@ -105,7 +105,7 @@ export function CharacterSelectView() {
                   takenByOther
                     ? "border-zinc-800 bg-zinc-900/50 opacity-40 cursor-not-allowed"
                     : isSelected
-                      ? "border-cyan-400 bg-cyan-400/10 shadow-[0_0_12px_rgba(0,229,255,0.15)]"
+                      ? "border-amber-400 bg-amber-400/10 shadow-[0_0_12px_rgba(245,158,11,0.15)]"
                       : "border-zinc-700 bg-zinc-900 hover:border-zinc-600 hover:bg-zinc-800 cursor-pointer",
                 ].join(" ")}
               >
@@ -119,11 +119,11 @@ export function CharacterSelectView() {
 
                 <div className="flex flex-col gap-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className={`text-sm font-mono font-bold ${isSelected ? "text-cyan-400" : "text-zinc-100"}`}>
+                    <span className={`text-sm font-mono font-bold ${isSelected ? "text-amber-400" : "text-zinc-100"}`}>
                       {char.name}
                     </span>
                     <span className="text-xs font-mono text-zinc-600">{char.codename}</span>
-                    {isLoading && <Loader2 className="w-3 h-3 animate-spin text-cyan-400" />}
+                    {isLoading && <Loader2 className="w-3 h-3 animate-spin text-amber-400" />}
                     {isSelected && !isLoading && <Badge variant="default" className="text-xs py-0">Você</Badge>}
                     {takenByOther && <Badge variant="zinc" className="text-xs py-0">Ocupado</Badge>}
                   </div>

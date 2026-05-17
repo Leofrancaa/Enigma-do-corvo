@@ -12,6 +12,7 @@ const nicknameSchema = z
 
 export const createRoomSchema = z.object({
   nickname: nicknameSchema,
+  caseId: uuidSchema.optional(),
 });
 
 export const joinRoomSchema = z.object({

@@ -1,0 +1,89 @@
+{
+  "slug": "o-dossie-do-submundo",
+  "title": "O Dossiê do Submundo",
+  "difficulty": "dificil",
+  "max_turns": 20,
+  "max_errors": 3,
+  "recommended_players_min": 3,
+  "recommended_players_max": 6,
+  "narrative_intro": "Fátima Rolo era o tipo de jornalista que não parava quando devia parar.\n\nFreelancer, 34 anos, especializada em crime organizado. Três prêmios de jornalismo investigativo. Uma inimiga por cada reportagem publicada.\n\nNa madrugada de uma sexta-feira, um vigia noturno encontrou o corpo de Fátima flutuando na doca 7 do Antigo Armazém Portuário. A câmera que ela sempre carregava: destruída. O celular: desaparecido. O pendrive que ela protegia como ouro: vazio.\n\nA perícia inicial disse: afogamento acidental. Mas a Dra. Lupa Costa, do Laboratório Forense, não acreditou por um segundo.\n\nFátima estava prestes a publicar 'O Dossiê do Submundo' — uma investigação de 18 meses que prometia revelar ao público a verdadeira identidade de 'Ferro', o lendário operador de uma rede de contrabando que movimentava milhões pelo porto da cidade. Ninguém sabia quem era 'Ferro'. Ninguém que contou continuou vivo para confirmar.\n\nAlguém chegou ao dossiê antes da publicação. Alguém que não podia se dar ao luxo de ser exposto.\n\nO relógio está correndo. O criminoso já sabe que a polícia está investigando. Descubram quem é 'Ferro' — antes que as provas desapareçam no fundo do mar.",
+  "solution_who": "Hector Monteiro",
+  "solution_where_slug": "armazem-portuario",
+  "solution_how": "Estrangulamento na doca 7 do armazém, com o corpo jogado na água para simular afogamento acidental",
+  "solution_why": "Hector Monteiro era 'Ferro', o operador do esquema de contrabando. O dossiê de Fátima Rolo tinha provas suficientes para destruí-lo. Ele a convocou para uma reunião no armazém fingindo ser uma fonte, e a eliminou antes que ela publicasse",
+  "solution_explanation": "Hector Augusto Monteiro, diretor administrativo do porto há 11 anos, era o homem por trás do codinome 'Ferro' — responsável por movimentar mercadoria contrabandeada (eletrônicos, remédios falsificados, armas) pelos contêineres do porto durante anos. Fátima Rolo o identificou ao rastrear pagamentos em dinheiro para funcionários do porto e cruzar com registros de manifesto alterados. Ela o contatou como 'fonte anônima', sem saber que estava falando com o próprio criminoso. Hector a convocou para um encontro na doca 7 do Armazém Portuário às 01h30 'para entregar documentos comprometedores contra Ferro'. Quando Fátima chegou, Hector a estrangulou e jogou o corpo na água. Destruiu a câmera, levou o celular e apagou o pendrive. O que ele não sabia: Fátima havia enviado uma cópia parcial do dossiê para um pendrive escondido no Parque Oásis Verde, e deixou um anagrama do nome dele pichado no Beco do Gato Preto como seguro de vida. A fibra de tecido encontrada pela perícia corresponde ao terno personalizado de Hector Monteiro, confeccionado por uma alfaiataria exclusiva.",
+  "clues": [
+    {
+      "location_slug": "armazem-portuario",
+      "type": "evidencia",
+      "display_content": "Cena do crime — doca 7. A câmera de Fátima está destruída, com a memória fisicamente retirada. O celular sumiu. O pendrive que ela carregava preso à corrente do pescoço foi encontrado vazio — apagado com pressa, como evidencia a rasura no chip. No piso molhado da doca, marcas de arrasto e duas marcas de joelho — sinal de uma luta antes de a vítima cair na água.",
+      "decoded_hint": null,
+      "reveals_field": "context",
+      "order": 1
+    },
+    {
+      "location_slug": "armazem-portuario",
+      "type": "depoimento",
+      "display_content": "Câmera de segurança do armazém (ângulo parcial): às 01h22, uma figura masculina alta, de terno escuro, entra pela portão lateral com chave própria. Às 01h47, sai sozinho pela mesma entrada. Entre 01h30 e 01h45, os microfones capturam sons de luta e um splash na água. A câmera foi desligada manualmente às 02h00 — por alguém que sabia a senha do sistema.",
+      "decoded_hint": null,
+      "reveals_field": "context",
+      "order": 2
+    },
+    {
+      "location_slug": "laboratorio-forense",
+      "type": "evidencia",
+      "display_content": "Laudo completo da Dra. Lupa Costa: 'Causa mortis REVISADA: estrangulamento por pressão manual no pescoço (equimoses bilaterais características de mãos grandes). O afogamento foi POSTMORTEM — a vítima estava morta quando entrou na água. Encontrado nas mãos da vítima: fragmento de tecido tweed cinza-chumbo de altíssima qualidade, com fio dourado característico de confecção artesanal exclusiva. Mãos grandes, força considerável. Suspeito do sexo masculino, estatura acima de 1,85m.'",
+      "decoded_hint": null,
+      "reveals_field": "how",
+      "order": 1
+    },
+    {
+      "location_slug": "laboratorio-forense",
+      "type": "referencia",
+      "display_content": "Alfaiataria 'Gomes & Filhos' — único fornecedor do tweed cinza-chumbo com fio dourado na cidade: 'Fazemos esse modelo exclusivo para apenas três clientes há seis anos. Um deles é o Sr. H. Monteiro, diretor do porto. Pedido mais recente: terno completo, entregue há duas semanas. Tamanho GG, ombros largos, altura 1,87m.' O alfaiate identificou o fragmento fotografado como sendo desse lote específico.",
+      "decoded_hint": null,
+      "reveals_field": "who",
+      "order": 2
+    },
+    {
+      "location_slug": "beco-gato-preto",
+      "type": "anagrama",
+      "display_content": "Pichação recente em tinta vermelha na parede do beco, entre os grafites habituais — a letra é diferente dos grafiteiros locais. Texto: 'SE EU SUMIR, PROCUREM TORMENIO. ELE É FERRO. — F.R.' A palavra TORMENIO está circulada três vezes. Abaixo, uma flecha apontando para o chão com a inscrição: 'rearranjar as letras'.",
+      "decoded_hint": "TORMENIO é um anagrama perfeito de MONTEIRO. As iniciais F.R. são de Fátima Rolo — ela escreveu isso como seguro de vida antes de ir ao encontro no armazém. Hector Monteiro é 'Ferro'.",
+      "reveals_field": "who",
+      "order": 1
+    },
+    {
+      "location_slug": "beco-gato-preto",
+      "type": "depoimento",
+      "display_content": "Moradora do beco, que prefere não se identificar: 'Essa mulher com câmera apareceu aqui há uns três dias. Ficou fotografando os grafites e pediu pra eu guardar um envelope, disse que era pra proteção dela. Aqui está. Ela disse que se alguém perguntasse por 'Ferro' eu mostrasse.' Dentro do envelope: um cartão com o endereço do Parque Oásis Verde e a frase: 'Pedra do corvo — embaixo.'",
+      "decoded_hint": null,
+      "reveals_field": "context",
+      "order": 2
+    },
+    {
+      "location_slug": "cafe-pista-quente",
+      "type": "depoimento",
+      "display_content": "O barista Renato, que conhecia Fátima de vista: 'Ela veio aqui na tarde da sexta — umas 18h. Estava diferente, nervosa mesmo. Recebeu uma mensagem no celular e ficou branca. Disse em voz alta: 'Ele topou se encontrar, não acredito'. Escreveu algo no guardanapo, dobrou e guardou no bolso. Saiu apressada. Esse guardanapo caiu debaixo da mesa — a faxineira guardou.' Guardanapo: 'H.M. — doca 7, 01h30. ELE É A FONTE? SE NÃO VOLTAR: PARQUE, PEDRA DO CORVO.'",
+      "decoded_hint": "H.M. — as iniciais do suspeito. Hector Monteiro fingiu ser uma fonte para atrair Fátima ao armazém.",
+      "reveals_field": "who",
+      "order": 1
+    },
+    {
+      "location_slug": "biblioteca-publica",
+      "type": "cifra",
+      "display_content": "Registro de empresas portuárias — arquivo público de 2019. A empresa 'DOCAS FERRO LTDA' aparece como administradora de três contêineres com irregularidades apontadas pela Receita Federal. O campo 'Sócio Administrador' foi preenchido em código interno do cartório: 'KHFWRU PRQWHLUR'. Nota no rodapé: 'Código cartório: deslocar cada letra 3 posições para trás no alfabeto.'",
+      "decoded_hint": "César -3: K→H, H→E, F→C, W→T, U→R = HECTO. R→O, P→M, Q→N, W→T, H→E, L→I, U→R, R→O = MONTEIRO. Nome completo: HECTOR MONTEIRO.",
+      "reveals_field": "who",
+      "order": 1
+    },
+    {
+      "location_slug": "parque-oasis-verde",
+      "type": "plot_twist",
+      "display_content": "Sob a 'pedra do corvo' — uma pedra negra marcada com uma cruz vermelha perto do lago — um pendrive impermeável envolto em plástico. Contém um arquivo de texto: o fragmento final do dossiê de Fátima Rolo. Última linha: 'Hector Augusto Monteiro, diretor do porto, É FERRO. Tenho registros de 47 cargas adulteradas, três funcionários que receberam propina com assinatura H.M., e a gravação de uma ligação onde ele menciona o codinome. Publico segunda-feira. Se não publicar: fui silenciada por ele. — Fátima Rolo, 23h15 de quinta-feira.'",
+      "decoded_hint": null,
+      "reveals_field": "why",
+      "order": 1
+    }
+  ]
+}

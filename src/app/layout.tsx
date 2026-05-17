@@ -13,16 +13,16 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Cifra Urbana: O Enigma do Corvo",
+  title: "Cifra Urbana: Departamento de Investigação",
   description:
-    "Jogo cooperativo de dedução ambientado numa metrópole cyberpunk distópica. Desvende crimes complexos orquestrados pelo misterioso Corvo.",
+    "Jogo cooperativo de dedução policial. Reúna sua equipe de investigadores, analise as pistas e feche o caso antes que o criminoso desapareça.",
   icons: {
     icon: "/favicon.ico",
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0a0a0c",
+  themeColor: "#0f0e0b",
   width: "device-width",
   initialScale: 1,
 };

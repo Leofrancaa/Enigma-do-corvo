@@ -47,12 +47,12 @@ export function ResolutionView() {
 
   return (
     <main className="relative flex flex-col items-center justify-start min-h-dvh px-6 py-10 scanlines overflow-y-auto">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,229,255,0.04)_0%,transparent_70%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(245,158,11,0.04)_0%,transparent_70%)]" />
 
       <div className="relative z-10 w-full max-w-2xl flex flex-col gap-8">
         {/* Header */}
         <div className="text-center flex flex-col gap-2">
-          <p className="text-xs font-mono text-cyan-400 uppercase tracking-widest">Caso Encerrado</p>
+          <p className="text-xs font-mono text-amber-400 uppercase tracking-widest">Caso Encerrado</p>
           <h1 className="text-2xl font-mono font-bold text-zinc-100">
             {room.case?.title ?? "Resolução"}
           </h1>
@@ -71,7 +71,7 @@ export function ResolutionView() {
               ].map(({ label, value }) => (
                 <div key={label} className="flex flex-col gap-1">
                   <span className="text-xs font-mono text-zinc-600 uppercase">{label}</span>
-                  <span className="text-sm font-mono text-cyan-400">{value}</span>
+                  <span className="text-sm font-mono text-amber-400">{value}</span>
                 </div>
               ))}
             </div>
@@ -100,13 +100,13 @@ export function ResolutionView() {
                   className={[
                     "flex items-center justify-between px-4 py-2.5 rounded-sm border",
                     idx === 0
-                      ? "border-cyan-400/40 bg-cyan-400/5"
+                      ? "border-amber-400/40 bg-amber-400/5"
                       : "border-zinc-800 bg-zinc-900",
                   ].join(" ")}
                 >
                   <div className="flex items-center gap-3">
                     <span className="text-sm font-mono text-zinc-600 w-5">{idx + 1}.</span>
-                    <span className={`text-sm font-mono ${isMe ? "text-cyan-400" : "text-zinc-200"}`}>
+                    <span className={`text-sm font-mono ${isMe ? "text-amber-400" : "text-zinc-200"}`}>
                       {p.nickname}
                     </span>
                     {idx === 0 && <Trophy className="w-3 h-3 text-yellow-400" />}

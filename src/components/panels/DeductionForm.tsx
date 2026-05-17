@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useGameStore } from "@/stores/useGameStore";
@@ -96,7 +96,7 @@ export function DeductionForm({ isFinal = false, onSuccess }: Props) {
         <select
           value={whereId}
           onChange={(e) => setWhereId(e.target.value)}
-          className="flex h-10 w-full rounded-sm border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm font-mono text-zinc-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-400 focus-visible:border-cyan-400"
+          className="flex h-10 w-full rounded-sm border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm font-mono text-zinc-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-amber-400 focus-visible:border-amber-400"
         >
           <option value="">Selecione o local...</option>
           {locations.map((loc: Location) => (

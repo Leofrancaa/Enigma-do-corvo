@@ -11,7 +11,10 @@ import { generateRoomCode } from "@/lib/utils/code-generator";
 
 // ─── Room ─────────────────────────────────────────────────────────────────────
 
-export async function createRoom(hostSessionId: string): Promise<{ id: string; code: string }> {
+export async function createRoom(
+  hostSessionId: string,
+  caseId?: string
+): Promise<{ id: string; code: string }> {
   let code = generateRoomCode();
   let attempts = 0;
 
@@ -19,7 +22,7 @@ export async function createRoom(hostSessionId: string): Promise<{ id: string; c
     try {
       const [room] = await db
         .insert(rooms)
-        .values({ code, hostSessionId })
+        .values({ code, hostSessionId, ...(caseId ? { caseId } : {}) })
         .returning({ id: rooms.id, code: rooms.code });
       return room;
     } catch (err: unknown) {

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useGameStore } from "@/stores/useGameStore";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Copy, Check, Loader2, Users } from "lucide-react";
+import { Copy, Check, Loader2, Users, FileText } from "lucide-react";
 import type { Player } from "@/types/game";
 
 export function LobbyView() {
@@ -46,12 +46,12 @@ export function LobbyView() {
 
   return (
     <main className="relative flex flex-col items-center justify-center min-h-dvh px-6 scanlines">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,229,255,0.04)_0%,transparent_70%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(245,158,11,0.04)_0%,transparent_70%)]" />
 
       <div className="relative z-10 w-full max-w-md flex flex-col gap-8">
         {/* Header */}
         <div className="flex flex-col gap-1 text-center">
-          <p className="text-xs font-mono text-cyan-400 uppercase tracking-widest">Sala de Espera</p>
+          <p className="text-xs font-mono text-amber-400 uppercase tracking-widest">Sala de Espera</p>
           <h1 className="text-2xl font-mono font-bold text-zinc-100">CIFRA URBANA</h1>
         </div>
 
@@ -60,19 +60,33 @@ export function LobbyView() {
           <p className="text-xs font-mono text-zinc-500 uppercase tracking-wider">Código de Convite</p>
           <button
             onClick={copyCode}
-            className="group flex items-center gap-3 bg-zinc-900 border border-zinc-700 hover:border-cyan-400/50 rounded-sm px-6 py-3 transition-all cursor-pointer"
+            className="group flex items-center gap-3 bg-zinc-900 border border-zinc-700 hover:border-amber-500/50 rounded-sm px-6 py-3 transition-all cursor-pointer"
           >
-            <span className="text-3xl font-mono font-bold tracking-[0.4em] text-cyan-400 neon-text">
+            <span className="text-3xl font-mono font-bold tracking-[0.4em] text-amber-400 neon-text">
               {room.code}
             </span>
             {copied ? (
               <Check className="w-4 h-4 text-emerald-400 shrink-0" />
             ) : (
-              <Copy className="w-4 h-4 text-zinc-600 group-hover:text-cyan-400 shrink-0 transition-colors" />
+              <Copy className="w-4 h-4 text-zinc-600 group-hover:text-amber-400 shrink-0 transition-colors" />
             )}
           </button>
           <p className="text-xs font-mono text-zinc-600">Clique para copiar</p>
         </div>
+
+        {/* Selected case */}
+        {room.case && (
+          <div className="flex flex-col gap-1.5 bg-zinc-900 border border-amber-500/20 rounded-sm px-4 py-3">
+            <div className="flex items-center gap-2 text-xs font-mono text-amber-400/70 uppercase tracking-wider">
+              <FileText className="w-3 h-3" />
+              Caso Selecionado
+            </div>
+            <p className="text-sm font-mono font-bold text-zinc-100">{room.case.title}</p>
+            <p className="text-xs font-mono text-zinc-500">
+              {room.case.maxTurns} turnos · {room.case.difficulty === "facil" ? "Fácil" : room.case.difficulty === "medio" ? "Médio" : "Difícil"}
+            </p>
+          </div>
+        )}
 
         {/* Players list */}
         <div className="flex flex-col gap-3">

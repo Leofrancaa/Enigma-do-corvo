@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useGameStore } from "@/stores/useGameStore";
 import { Badge } from "@/components/ui/badge";
@@ -25,12 +25,12 @@ export function PlayersPanel() {
           return (
             <div
               key={p.id}
-              className={`flex items-center gap-3 px-4 py-2.5 ${isTurn ? "bg-cyan-400/5 border-l-2 border-cyan-400" : ""}`}
+              className={`flex items-center gap-3 px-4 py-2.5 ${isTurn ? "bg-amber-400/5 border-l-2 border-amber-400" : ""}`}
             >
               <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${isOnline ? "bg-emerald-400" : "bg-zinc-600"}`} />
               <div className="flex flex-col gap-0.5 min-w-0">
                 <div className="flex items-center gap-1.5 min-w-0">
-                  <span className={`text-xs font-mono truncate ${isMe ? "text-cyan-400" : "text-zinc-300"}`}>
+                  <span className={`text-xs font-mono truncate ${isMe ? "text-amber-400" : "text-zinc-300"}`}>
                     {p.nickname}
                   </span>
                   {isTurn && <Badge variant="default" className="text-xs py-0 shrink-0">Vez</Badge>}

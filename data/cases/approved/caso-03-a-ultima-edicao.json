@@ -1,0 +1,73 @@
+{
+  "slug": "a-ultima-edicao",
+  "title": "A Última Edição",
+  "difficulty": "medio",
+  "max_turns": 25,
+  "max_errors": 5,
+  "recommended_players_min": 3,
+  "recommended_players_max": 6,
+  "narrative_intro": "No coração pulsante da metrópole, a redação do jornal 'A Voz da Cidade' era um farol de verdade. Até que o farol se apagou. Arthur Penumbra, o editor-chefe conhecido por suas investigações implacáveis, foi encontrado em sua sala, a cabeça sobre a máquina de escrever antiga, um copo de uísque pela metade e um maço de cigarros amassado. O relógio de parede, um presente de sua esposa, estava parado às 03h17. A polícia local, liderada pelo Chefe Rino Pereira, rapidamente concluiu 'morte natural por exaustão'. Mas a Dra. Lupa Costa, a legista, notou algo estranho: um leve cheiro de amêndoas amargas no ar e uma pequena mancha roxa quase imperceptível no pescoço de Arthur.\n\nEm sua máquina de escrever, a última frase digitada, ainda incompleta: 'O segredo do Beco do Gato Preto está guardado por...'\n\nArthur estava investigando uma série de desaparecimentos de jovens artistas de rua, casos que a polícia parecia ignorar. Ele estava perto de desvendar algo grande, algo que alguém não queria que viesse à tona. Agora, a verdade está nas suas mãos. Quem silenciou a voz da cidade para sempre?",
+  "solution_who": "Isadora Lima",
+  "solution_where_slug": "beco-gato-preto",
+  "solution_how": "Asfixia por cianeto de potássio administrado via injeção rápida no pescoço, simulando um mal súbito. O cianeto foi disfarçado no uísque para mascarar o cheiro inicial.",
+  "solution_why": "Arthur Penumbra estava prestes a expor a rede de tráfico de pessoas que Isadora Lima operava, usando os desaparecimentos de artistas de rua como fachada para recrutar e explorar jovens talentos em um esquema internacional. A última reportagem de Arthur revelaria a conexão de Isadora com o submundo do Beco do Gato Preto e um esquema de lavagem de dinheiro que envolvia figuras poderosas da cidade.",
+  "solution_explanation": "Isadora Lima, uma agente infiltrada que se tornou líder de uma rede de tráfico, sabia que Arthur Penumbra estava investigando os desaparecimentos. Ela o contatou sob o pretexto de ser uma informante disposta a 'revelar tudo' sobre o Beco do Gato Preto. Encontrou-o em sua redação tarde da noite, ofereceu-lhe um uísque e, enquanto ele estava distraído, administrou o cianeto. A mancha roxa no pescoço era o ponto da injeção. O relógio parado simboliza o tempo que Arthur não teve para revelar a verdade. A frase incompleta na máquina de escrever era a pista final que ele tentou deixar.",
+  "clues": [
+    {
+      "location_slug": "delegacia-central",
+      "type": "depoimento",
+      "display_content": "Chefe Rino Pereira, com a voz rouca de cansaço, afirma: 'Arthur era um bom homem, mas teimoso. Sempre metendo o nariz onde não devia. A Dra. Lupa insiste que não foi natural, mas não temos provas. Ele andava obcecado com uns desaparecimentos de rua. Falava de um Sussurro que ia dar a ele a grande história.'",
+      "decoded_hint": null,
+      "reveals_field": "context",
+      "order": 1
+    },
+    {
+      "location_slug": "laboratorio-forense",
+      "type": "evidencia",
+      "display_content": "Laudo preliminar da Dra. Lupa Costa: 'Causa mortis: asfixia por envenenamento. Traços de cianeto de potássio detectados no sangue. Pequena marca de punção no pescoço, quase imperceptível, compatível com agulha fina. O cheiro de amêndoas amargas foi mascarado pelo uísque. A substância é de ação rápida.'",
+      "decoded_hint": null,
+      "reveals_field": "how",
+      "order": 1
+    },
+    {
+      "location_slug": "cafe-pista-quente",
+      "type": "referencia",
+      "display_content": "O Detetive Faro Silva, tomando um café forte, comenta: 'Arthur vinha aqui quase todo dia. Na noite do crime, ele parecia agitado. Recebeu uma ligação e disse que tinha um encontro importante na redação, com uma fonte que prometeu virar o jogo. Ele mencionou algo sobre o segredo do gato preto. Parecia animado, mas também tenso.'",
+      "decoded_hint": null,
+      "reveals_field": "context",
+      "order": 1
+    },
+    {
+      "location_slug": "biblioteca-publica",
+      "type": "anagrama",
+      "display_content": "Em um livro antigo sobre criptografia, na seção de 'Crimes Não Resolvidos', uma anotação à margem, escrita à mão por Arthur: 'O informante é um enigma. ADORAS A LIMA. O que isso significa?'",
+      "decoded_hint": "'ADORAS A LIMA' é um anagrama de 'ISADORA LIMA'. O nome da assassina.",
+      "reveals_field": "who",
+      "order": 1
+    },
+    {
+      "location_slug": "armazem-portuario",
+      "type": "evidencia",
+      "display_content": "Uma caixa de papelão escondida entre contêineres, com o logotipo de uma empresa de importação e exportação. Dentro, documentos de embarque falsificados e uma lista de nomes de jovens artistas de rua, com datas de embarque e destino para cidades estrangeiras. No topo da lista, um carimbo com as iniciais 'I.L.'.",
+      "decoded_hint": null,
+      "reveals_field": "why",
+      "order": 1
+    },
+    {
+      "location_slug": "beco-gato-preto",
+      "type": "plot_twist",
+      "display_content": "Escondido atrás de uma lata de lixo, um pequeno gravador digital. Ao reproduzir, ouve-se a voz de Arthur, ofegante: 'Ela está aqui... não é uma informante... É a cabeça do esquema... Beco do Gato Preto... ela vai me matar... Isadora...'. O áudio é cortado abruptamente por um som e um gemido fraco.",
+      "decoded_hint": null,
+      "reveals_field": "who",
+      "order": 1
+    },
+    {
+      "location_slug": "parque-oasis-verde",
+      "type": "cifra",
+      "display_content": "Em um banco do parque, um bilhete amassado com números e uma nota: 'Chave de substituição: I=9, S=19, A=1, D=4, O=15, R=18. A mensagem é: 9-19-1-4-15-18-1. Quem é o assassino?'",
+      "decoded_hint": "Aplicando a chave: 9=I, 19=S, 1=A, 4=D, 15=O, 18=R, 1=A → ISADORA. O bilhete revela o primeiro nome da assassina: Isadora Lima.",
+      "reveals_field": "who",
+      "order": 1
+    }
+  ]
+}

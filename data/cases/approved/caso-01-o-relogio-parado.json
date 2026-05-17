@@ -1,0 +1,81 @@
+{
+  "slug": "o-relogio-parado",
+  "title": "O Relógio Parado",
+  "difficulty": "facil",
+  "max_turns": 22,
+  "max_errors": 4,
+  "recommended_players_min": 2,
+  "recommended_players_max": 6,
+  "narrative_intro": "Roberto Caldas era o tipo de investigador que não largava um caso. Aposentado da polícia há 15 anos, ele abriu seu escritório particular no andar de cima do Café 'A Pista Quente' — e nunca parou de trabalhar.\n\nNa manhã de uma quinta-feira nublada, a atendente Sônia encontrou Roberto sentado à sua mesa de sempre. Uma xícara de café frio à sua frente. Um relógio de bolso antigo, parado às 02h47, sobre a mesa. Morto. O médico legista estimou que a morte ocorreu entre meia-noite e 3h da manhã.\n\nNo caderno aberto ao lado da xícara, a última linha que Roberto escreveu antes de morrer: 'DRUMOND ESTAVA LÁ. ELA SABE QUEM DEU O TIRO.'\n\nRoberto investigava há três meses um assassinato não resolvido de 1987 — um crime que a polícia arquivou rapidamente demais. Agora ele é a vítima.\n\nAlguém soube que ele estava chegando perto demais da verdade.\n\nCabe a vocês descobrir: o que Roberto encontrou, e quem silenciou o relógio para sempre?",
+  "solution_who": "Marciana Drumond",
+  "solution_where_slug": "cafe-pista-quente",
+  "solution_how": "Arsênio dissolvido no café da vítima durante um encontro noturno secreto no café, simulando morte natural por parada cardíaca",
+  "solution_why": "Roberto Caldas estava prestes a reabrir o caso do assassinato de 1987 que Marciana Drumond encomendou para ficar com a empresa do sócio Hélio Vasconcelos — crime que nunca foi investigado a fundo graças a pressão política",
+  "solution_explanation": "Marciana Drumond, atual vereadora da cidade, foi a mandante do assassinato de Hélio Vasconcelos em 1987 — seu sócio nos negócios. Ela pagou 8.000 cruzeiros a um pistoleiro (morto em 2003) para eliminar Hélio quando ele tentou dissolvê-la da sociedade. O caso foi arquivado em 40 dias por pressão política e Marciana herdou a empresa inteira. Roberto Caldas, sobrinho de Hélio, passou 15 anos reunindo provas e estava a horas de protocolar uma reabertura formal no Ministério Público. Marciana o convocou ao café com a promessa de 'testemunhar em favor da reabertura'. Chegou disfarçada com sobretudo cinza e luvas, dissolveu arsênio no café de Roberto e foi embora antes que ele sentisse qualquer sintoma. O relógio de bolso que Roberto deixou sobre a mesa pertencia a Hélio — era uma mensagem para quem encontrasse o corpo: o tempo nunca para para a verdade.",
+  "clues": [
+    {
+      "location_slug": "cafe-pista-quente",
+      "type": "evidencia",
+      "display_content": "A xícara de café de Roberto, analisada na cena: fundo com resíduo escuro e cheiro ligeiramente adocicado — incomum para o café preto que ele sempre pedia. A atendente Sônia afirma que uma mulher de sobretudo cinza sentou-se brevemente à mesa de Roberto por volta da meia-noite. 'Ela usava luvas finas, mesmo sendo verão. Pediu nada. Saiu antes das 00h15.'",
+      "decoded_hint": null,
+      "reveals_field": "context",
+      "order": 1
+    },
+    {
+      "location_slug": "cafe-pista-quente",
+      "type": "referencia",
+      "display_content": "Caderno de Roberto, última página preenchida: 'DRUMOND ESTAVA LÁ EM 1987. ELA SABE QUEM DEU O TIRO. — Confirmar com arquivo na Biblioteca. Chave do armazém com Zé do Cais. Reunião marcada para 00h00 no café. Ela disse que quer ajudar. Será?'",
+      "decoded_hint": null,
+      "reveals_field": "why",
+      "order": 2
+    },
+    {
+      "location_slug": "delegacia-central",
+      "type": "cifra",
+      "display_content": "Ficha do caso arquivado em 1987 — Homicídio #487-B. O campo 'Suspeita Principal' foi rabiscado com tinta, mas à margem do papel, a tinta desbotou e revela uma anotação em código: 'NBSDJBOB ESVENPO'. A nota abaixo diz: 'deslocar cada letra 1 posição para trás no alfabeto para revelar o nome real'.",
+      "decoded_hint": "César -1: N→M, B→A, S→R, D→C, J→I, B→A, O→N = MARCIAN. A→(espaço), E→D, S→R, V→U, N→M, E→D, P→O, N→M = DRUMOND. Nome completo: MARCIANA DRUMOND.",
+      "reveals_field": "who",
+      "order": 1
+    },
+    {
+      "location_slug": "biblioteca-publica",
+      "type": "anagrama",
+      "display_content": "Livro de atas do Conselho Municipal de 1987, com uma dedicatória manuscrita na capa: 'Para a futura vereadora MACARONI DUMAND, que sempre soube o que queria. Com admiração, H.V.' A grafia do nome está curiosamente embaralhada — como se o autor tivesse codificado quem recebia o livro.",
+      "decoded_hint": "MACARONI DUMAND é um anagrama perfeito de MARCIANA DRUMOND. As iniciais H.V. são de Hélio Vasconcelos — a vítima de 1987, que assinou este livro antes de ser assassinado.",
+      "reveals_field": "who",
+      "order": 1
+    },
+    {
+      "location_slug": "laboratorio-forense",
+      "type": "evidencia",
+      "display_content": "Laudo toxicológico de Roberto Caldas: 'Causa mortis: envenenamento por trióxido de arsênio (As₂O₃). Substância inodora, insípida, solúvel em líquidos quentes. Quantidade detectada: 45mg — suficiente para causar parada cardíaca em 60 a 90 minutos após ingestão. Administração estimada: entre 23h45 e 00h30. Não há sinais de luta física.'",
+      "decoded_hint": null,
+      "reveals_field": "how",
+      "order": 1
+    },
+    {
+      "location_slug": "beco-gato-preto",
+      "type": "depoimento",
+      "display_content": "Morador do beco, apelidado de Zé-Sombra, aceita conversar no escuro: 'Era quase meia-noite. Uma BMW preta parou na esquina do café. Uma mulher desceu — sobretudo cinza, luvas escuras. Entrou, saiu em menos de dez minutos. Depois de uns vinte minutos eu vi pela janela o velhinho já caído na mesa. Anotei a placa porque achei esquisito: MRC-1987.'",
+      "decoded_hint": "MRC-1987: as iniciais MRC correspondem a Marciana (M), um nome com R e C. O número 1987 é o ano do crime original que ela cometeu — a placa era personalizada.",
+      "reveals_field": "context",
+      "order": 1
+    },
+    {
+      "location_slug": "armazem-portuario",
+      "type": "referencia",
+      "display_content": "Caixa lacrada escondida atrás de uma pilha de caixotes — a chave estava no bolso de Roberto quando foi encontrado. Dentro: documentos originais do caso de 1987. Um contrato de sociedade entre 'VASCONCELOS & DRUMOND INCORPORAÇÕES' e uma carta manuscrita de Hélio Vasconcelos, nunca enviada: 'Roberto, se algo me acontecer: foi Marciana. Ela soube que mudei o testamento. Guarde estes documentos. O tempo vai cobrar a conta dela.'",
+      "decoded_hint": null,
+      "reveals_field": "why",
+      "order": 1
+    },
+    {
+      "location_slug": "parque-oasis-verde",
+      "type": "plot_twist",
+      "display_content": "Escondida sob uma pedra marcada com tinta vermelha perto do lago — uma pastinha plástica impermeável. Dentro, o rascunho do relatório final de Roberto, com uma linha sublinhada três vezes em vermelho: 'Marciana Drumond não apenas sabia do crime de 1987. Ela o encomendou. Pagou 8.000 cruzeiros a Gordo Telles (falecido em 2003). O pistoleiro morto nunca pode depor. Mas os documentos do armazém podem. Ela vai tentar me parar antes de eu protocolar. Se você está lendo isso — eu estava certo. E ela soube que eu sabia.'",
+      "decoded_hint": null,
+      "reveals_field": "context",
+      "order": 1
+    }
+  ]
+}

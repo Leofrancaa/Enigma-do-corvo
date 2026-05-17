@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useGameStore } from "@/stores/useGameStore";
@@ -83,7 +83,7 @@ export function CluesPanel() {
                     {clue.displayContent}
                   </p>
                   {isOpen && clue.decodedHint && (
-                    <p className="text-xs font-mono text-cyan-400/70 italic border-t border-zinc-800 pt-2 mt-1">
+                    <p className="text-xs font-mono text-amber-400/70 italic border-t border-zinc-800 pt-2 mt-1">
                       Dica: {clue.decodedHint}
                     </p>
                   )}

@@ -2,13 +2,13 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Cifra Urbana: O Enigma do Corvo",
+    name: "Cifra Urbana: Departamento de Investigação",
     short_name: "Cifra Urbana",
-    description: "Jogo cooperativo de dedução cyberpunk",
+    description: "Jogo cooperativo de dedução policial cartoonesco",
     start_url: "/",
     display: "standalone",
-    background_color: "#0a0a0c",
-    theme_color: "#0a0a0c",
+    background_color: "#0f0e0b",
+    theme_color: "#0f0e0b",
     orientation: "any",
     icons: [
       {

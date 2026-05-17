@@ -97,7 +97,7 @@ export function GameView() {
           </Badge>
           <span className="text-xs font-mono hidden sm:inline">
             {isMyTurn ? (
-              <span className="text-cyan-400 font-bold">Sua vez</span>
+              <span className="text-amber-400 font-bold">Sua vez</span>
             ) : (
               <span className="text-zinc-500">Vez de <span className="text-zinc-300">{currentPlayer?.nickname}</span></span>
             )}
@@ -150,8 +150,8 @@ export function GameView() {
 
           {moving && (
             <div className="absolute inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm z-20">
-              <div className="flex items-center gap-2 bg-zinc-900 border border-cyan-400/30 rounded-sm px-4 py-2">
-                <Loader2 className="w-4 h-4 animate-spin text-cyan-400" />
+              <div className="flex items-center gap-2 bg-zinc-900 border border-amber-400/30 rounded-sm px-4 py-2">
+                <Loader2 className="w-4 h-4 animate-spin text-amber-400" />
                 <span className="text-xs font-mono text-zinc-300">Movendo...</span>
               </div>
             </div>

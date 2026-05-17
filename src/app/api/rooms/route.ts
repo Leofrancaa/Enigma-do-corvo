@@ -12,10 +12,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
     }
 
-    const { nickname } = parsed.data;
+    const { nickname, caseId } = parsed.data;
     const sessionId = await getOrCreateSessionId();
 
-    const room = await createRoom(sessionId);
+    const room = await createRoom(sessionId, caseId);
     await createPlayer({ roomId: room.id, sessionId, nickname, isHost: true });
 
     return NextResponse.json({ roomId: room.id, code: room.code });

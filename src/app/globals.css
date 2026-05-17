@@ -1,24 +1,24 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-background: #0a0a0c;
-  --color-foreground: #e4e4e7;
-  --color-cyan: #00e5ff;
-  --color-magenta: #ff2a6d;
-  --color-zinc-950: #09090b;
-  --color-zinc-900: #18181b;
-  --color-zinc-800: #27272a;
-  --color-zinc-700: #3f3f46;
-  --color-zinc-600: #52525b;
-  --color-zinc-400: #a1a1aa;
-  --color-zinc-300: #d4d4d8;
+  --color-background: #0f0e0b;
+  --color-foreground: #f5f0e8;
+  --color-amber: #f59e0b;
+  --color-crimson: #dc2626;
+  --color-zinc-950: #0f0e0b;
+  --color-zinc-900: #1c1a15;
+  --color-zinc-800: #2a2820;
+  --color-zinc-700: #3d3b30;
+  --color-zinc-600: #5a5747;
+  --color-zinc-400: #a09a88;
+  --color-zinc-300: #d4cfc0;
   --font-sans: var(--font-geist-sans);
   --font-mono: "JetBrains Mono", "Geist Mono", ui-monospace, monospace;
 }
 
 :root {
-  --background: #0a0a0c;
-  --foreground: #e4e4e7;
+  --background: #0f0e0b;
+  --foreground: #f5f0e8;
 }
 
 * {
@@ -44,38 +44,34 @@ body {
   height: 4px;
 }
 ::-webkit-scrollbar-track {
-  background: #18181b;
+  background: #1c1a15;
 }
 ::-webkit-scrollbar-thumb {
-  background: #3f3f46;
+  background: #3d3b30;
   border-radius: 2px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #00e5ff40;
+  background: #f59e0b40;
 }
 
-/* Neon glow utilities */
+/* Amber glow utilities */
 .neon-text {
-  text-shadow: 0 0 8px rgba(0, 229, 255, 0.6), 0 0 20px rgba(0, 229, 255, 0.3);
+  text-shadow: 0 0 8px rgba(245, 158, 11, 0.7), 0 0 20px rgba(245, 158, 11, 0.3);
 }
 .neon-border {
-  box-shadow: 0 0 8px rgba(0, 229, 255, 0.2), inset 0 0 8px rgba(0, 229, 255, 0.05);
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.2), inset 0 0 8px rgba(245, 158, 11, 0.05);
 }
-.neon-magenta {
-  text-shadow: 0 0 8px rgba(255, 42, 109, 0.6), 0 0 20px rgba(255, 42, 109, 0.3);
+.neon-red {
+  text-shadow: 0 0 8px rgba(220, 38, 38, 0.7), 0 0 20px rgba(220, 38, 38, 0.3);
 }
 
-/* Scanline overlay (subtle) */
+/* Paper grain overlay (noir atmosphere) */
 .scanlines::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(0, 0, 0, 0.03) 2px,
-    rgba(0, 0, 0, 0.03) 4px
-  );
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
   pointer-events: none;
+  opacity: 0.4;
 }

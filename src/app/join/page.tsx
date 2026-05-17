@@ -45,12 +45,12 @@ export default function JoinPage() {
 
   return (
     <main className="relative flex flex-col items-center justify-center min-h-dvh px-6 scanlines">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,42,109,0.04)_0%,transparent_70%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(245,158,11,0.04)_0%,transparent_70%)]" />
 
       <div className="relative z-10 w-full max-w-sm flex flex-col gap-8">
         <Link
           href="/"
-          className="inline-flex items-center gap-2 text-xs font-mono text-zinc-500 hover:text-cyan-400 transition-colors w-fit"
+          className="inline-flex items-center gap-2 text-xs font-mono text-zinc-500 hover:text-amber-400 transition-colors w-fit"
         >
           <ArrowLeft className="w-3 h-3" />
           Voltar
@@ -88,7 +88,7 @@ export default function JoinPage() {
             <Input
               id="nickname"
               type="text"
-              placeholder="Ex: GatoNeon"
+              placeholder="Ex: AgenteFlash"
               value={nickname}
               onChange={(e) => setNickname(e.target.value)}
               maxLength={20}

@@ -4,18 +4,18 @@
  *
  * Tipos de célula:
  * -1 = parede (não navegável, fundo escuro)
- *  0 = caminho (quadradinho amarelo)
+ *  0 = caminho (quadradinho navegável)
  * 10..16 = interior de local (exibe imagem)
  * 20..26 = entrada de local (caminho com seta)
  *
  * Locais (índice → slug):
- * 10 = torre-dados          | 20 = entrada torre-dados
- * 11 = observatorio-zenite  | 21 = entrada observatorio
- * 12 = catedral-codigo      | 22 = entrada catedral
- * 13 = mercado-neon         | 23 = entrada mercado
- * 14 = terminal-subterraneo | 24 = entrada terminal (esq/dir/baixo)
- * 15 = docas-silicio        | 25 = entrada docas
- * 16 = beco-cifras          | 26 = entrada beco
+ * 10 = laboratorio-forense  | 20 = entrada laboratorio
+ * 11 = parque-oasis-verde   | 21 = entrada parque
+ * 12 = beco-gato-preto      | 22 = entrada beco
+ * 13 = cafe-pista-quente    | 23 = entrada café
+ * 14 = biblioteca-publica   | 24 = entrada biblioteca
+ * 15 = armazem-portuario    | 25 = entrada armazém
+ * 16 = delegacia-central    | 26 = entrada delegacia
  */
 
 export const BOARD_ROWS = 15;
@@ -24,23 +24,23 @@ export const CELL_PX = 38; // pixels por célula no SVG
 
 // Mapeamento: código de sala → slug do local
 export const ROOM_CODE_TO_SLUG: Record<number, string> = {
-  10: "torre-dados",
-  11: "observatorio-zenite",
-  12: "catedral-codigo",
-  13: "mercado-neon",
-  14: "terminal-subterraneo",
-  15: "docas-silicio",
-  16: "beco-cifras",
+  10: "laboratorio-forense",
+  11: "parque-oasis-verde",
+  12: "beco-gato-preto",
+  13: "cafe-pista-quente",
+  14: "biblioteca-publica",
+  15: "armazem-portuario",
+  16: "delegacia-central",
 };
 
 export const ENTRY_CODE_TO_SLUG: Record<number, string> = {
-  20: "torre-dados",
-  21: "observatorio-zenite",
-  22: "catedral-codigo",
-  23: "mercado-neon",
-  24: "terminal-subterraneo",
-  25: "docas-silicio",
-  26: "beco-cifras",
+  20: "laboratorio-forense",
+  21: "parque-oasis-verde",
+  22: "beco-gato-preto",
+  23: "cafe-pista-quente",
+  24: "biblioteca-publica",
+  25: "armazem-portuario",
+  26: "delegacia-central",
 };
 
 // Direção da seta de entrada (para o SVG)
@@ -56,23 +56,23 @@ export const ENTRY_DIRECTION: Record<number, "up" | "down" | "left" | "right"> =
 
 // Retângulos dos locais no tabuleiro [rowStart, rowEnd, colStart, colEnd]
 export const ROOM_RECTS: Record<string, [number, number, number, number]> = {
-  "torre-dados":          [0, 2, 2, 5],
-  "observatorio-zenite":  [0, 2, 7, 11],
-  "catedral-codigo":      [0, 2, 14, 17],
-  "mercado-neon":         [5, 9, 0, 3],
-  "terminal-subterraneo": [5, 9, 7, 12],
-  "docas-silicio":        [5, 9, 16, 19],
-  "beco-cifras":          [12, 14, 6, 13],
+  "laboratorio-forense": [0, 2, 2, 5],
+  "parque-oasis-verde":  [0, 2, 7, 11],
+  "beco-gato-preto":     [0, 2, 14, 17],
+  "cafe-pista-quente":   [5, 9, 0, 3],
+  "biblioteca-publica":  [5, 9, 7, 12],
+  "armazem-portuario":   [5, 9, 16, 19],
+  "delegacia-central":   [12, 14, 6, 13],
 };
 
 // Posições de início por personagem (todos em células de caminho)
 export const CHARACTER_START: Record<string, [number, number]> = {
-  "kaito-nakamura":  [3,  9],
-  "anya-petrova":    [3,  3],
-  "jax-thorne":      [10, 3],
-  "lena-volkov":     [10, 16],
-  "silas-blackwood": [3, 15],
-  "zara-khan":       [10, 10],
+  "faro-silva":     [3,  9],
+  "lupa-costa":     [3,  3],
+  "flash-santos":   [10, 3],
+  "sussurro-lima":  [10, 16],
+  "pixel-mendes":   [3, 15],
+  "rino-pereira":   [10, 10],
 };
 
 export const DEFAULT_START: [number, number] = [10, 9];

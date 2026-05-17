@@ -41,8 +41,8 @@ export async function POST(
       return NextResponse.json({ error: "Mínimo 2 jogadores para iniciar." }, { status: 400 });
     }
 
-    // Pick case
-    let caseId = parsed.data.caseId;
+    // Use pre-selected case (set at room creation) or fallback to provided/random
+    let caseId = room.caseId ?? parsed.data.caseId;
     if (!caseId) {
       const allCases = await getAvailableCases();
       if (allCases.length === 0) {
