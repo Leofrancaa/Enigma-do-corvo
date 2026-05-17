@@ -87,7 +87,16 @@ export async function getRoomSnapshot(roomId: string, sessionId: string) {
 
   const me = room.players.find((p) => p.sessionId === sessionId) ?? null;
 
-  return { room, worldMap, discoveredClues: discovered, allCharacters, me };
+  // Flatten discoveredClues: the DB join returns { clue: Clue, ... }
+  // but the client types expect flat Clue objects with discoveredAt
+  const flatClues = discovered.map((d) => ({
+    ...d.clue,
+    discoveredAt: d.discoveredAt instanceof Date
+      ? d.discoveredAt.toISOString()
+      : String(d.discoveredAt),
+  }));
+
+  return { room, worldMap, discoveredClues: flatClues, allCharacters, me };
 }
 
 // ─── Players ──────────────────────────────────────────────────────────────────
