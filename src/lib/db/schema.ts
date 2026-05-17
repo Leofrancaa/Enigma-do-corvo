@@ -354,5 +354,4 @@ export const playerActionsRelations = relations(playerActions, ({ one }) => ({
 export const guessesRelations = relations(guesses, ({ one }) => ({
   room: one(rooms, { fields: [guesses.roomId], references: [rooms.id] }),
   player: one(players, { fields: [guesses.playerId], references: [players.id] }),
-  whereLocation: one(locations, { fields: [guesses.whereId], references: [locations.id] }),
 }));
