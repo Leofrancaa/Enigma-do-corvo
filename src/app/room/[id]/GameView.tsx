@@ -51,9 +51,6 @@ export function GameView() {
     avatarUrl: p.character?.avatarUrl,
   }));
 
-  // Detecta mobile
-  const isMobile = typeof window !== "undefined" && window.innerWidth < 1024;
-
   async function handleCellClick(row: number, col: number) {
     if (moving) return;
     setMoving(true);
@@ -145,7 +142,6 @@ export function GameView() {
             players={playerDots}
             reachable={reachable}
             onCellClick={handleCellClick}
-            isMobile={isMobile}
           />
 
           {moving && (

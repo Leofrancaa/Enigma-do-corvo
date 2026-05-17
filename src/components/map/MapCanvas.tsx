@@ -1,7 +1,5 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { useGesture } from "@use-gesture/react";
 import {
   BOARD_GRID,
   BOARD_ROWS,
@@ -9,17 +7,21 @@ import {
   CELL_PX,
   ROOM_RECTS,
   ENTRY_DIRECTION,
-  isNavigable,
   isRoomCell,
   isEntryCell,
 } from "@/lib/game/board";
 import type { Location } from "@/types/game";
 
-const PLAYER_COLORS = ["#00e5ff", "#ff2a6d", "#a855f7", "#22c55e", "#f59e0b", "#3b82f6"];
-const PATH_COLOR = "#d4c090";
-const PATH_STROKE = "#b8a070";
-const ENTRY_COLOR = "#e8d49a";
-const BOARD_BG = "#1a1208";
+// Detective noir palette
+const PLAYER_COLORS = ["#f59e0b", "#ef4444", "#a855f7", "#22c55e", "#3b82f6", "#ec4899"];
+const PATH_COLOR    = "#1e1e28";
+const PATH_STROKE   = "#2a2a38";
+const ENTRY_BG      = "#151520";
+const BOARD_BG      = "#0f0e0b";
+const BOARD_BORDER  = "#78350f";
+const REACH_FILL    = "rgba(245,158,11,0.18)";
+const REACH_STROKE  = "#f59e0b";
+const ARROW_COLOR   = "#f59e0b";
 
 const SVG_W = BOARD_COLS * CELL_PX;
 const SVG_H = BOARD_ROWS * CELL_PX;
@@ -39,74 +41,39 @@ interface Props {
   players: PlayerDot[];
   reachable: Array<[number, number]>;
   onCellClick?: (row: number, col: number) => void;
-  isMobile?: boolean;
 }
 
-// Arrow SVG paths by direction
 function ArrowPath({ direction, cx, cy, size }: { direction: string; cx: number; cy: number; size: number }) {
   const h = size * 0.5;
   switch (direction) {
-    case "up":
-      return <polygon points={`${cx},${cy - h} ${cx - h},${cy + h} ${cx + h},${cy + h}`} fill="#ff2a6d" opacity={0.85} />;
-    case "down":
-      return <polygon points={`${cx},${cy + h} ${cx - h},${cy - h} ${cx + h},${cy - h}`} fill="#ff2a6d" opacity={0.85} />;
-    case "left":
-      return <polygon points={`${cx - h},${cy} ${cx + h},${cy - h} ${cx + h},${cy + h}`} fill="#ff2a6d" opacity={0.85} />;
-    case "right":
-      return <polygon points={`${cx + h},${cy} ${cx - h},${cy - h} ${cx - h},${cy + h}`} fill="#ff2a6d" opacity={0.85} />;
-    default:
-      return null;
+    case "up":    return <polygon points={`${cx},${cy-h} ${cx-h},${cy+h} ${cx+h},${cy+h}`}   fill={ARROW_COLOR} opacity={0.9} />;
+    case "down":  return <polygon points={`${cx},${cy+h} ${cx-h},${cy-h} ${cx+h},${cy-h}`}   fill={ARROW_COLOR} opacity={0.9} />;
+    case "left":  return <polygon points={`${cx-h},${cy} ${cx+h},${cy-h} ${cx+h},${cy+h}`}   fill={ARROW_COLOR} opacity={0.9} />;
+    case "right": return <polygon points={`${cx+h},${cy} ${cx-h},${cy-h} ${cx-h},${cy+h}`}   fill={ARROW_COLOR} opacity={0.9} />;
+    default:      return null;
   }
 }
 
-export function MapCanvas({ locations, players, reachable, onCellClick, isMobile = false }: Props) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [pan, setPan] = useState({ x: 0, y: 0 });
-
-  // Pan only on mobile, fixed on desktop
-  useGesture(
-    {
-      onDrag: ({ delta: [dx, dy] }) => {
-        if (!isMobile) return;
-        setPan((p) => ({
-          x: Math.min(0, Math.max(p.x + dx, -(SVG_W - (containerRef.current?.clientWidth ?? SVG_W)))),
-          y: Math.min(0, Math.max(p.y + dy, -(SVG_H - (containerRef.current?.clientHeight ?? SVG_H)))),
-        }));
-      },
-    },
-    { target: containerRef, eventOptions: { passive: false } }
-  );
-
+export function MapCanvas({ locations, players, reachable, onCellClick }: Props) {
   const reachableSet = new Set(reachable.map(([r, c]) => `${r},${c}`));
 
-  // Build a slug → location map
   const slugToLoc = new Map<string, Location>();
   for (const loc of locations) slugToLoc.set(loc.slug, loc);
 
   return (
-    <div
-      ref={containerRef}
-      className="w-full h-full overflow-hidden touch-none select-none"
-      style={{ background: BOARD_BG, cursor: isMobile ? "grab" : "default" }}
-    >
+    <div className="w-full h-full">
       <svg
-        width={SVG_W}
-        height={SVG_H}
         viewBox={`0 0 ${SVG_W} ${SVG_H}`}
-        style={{
-          transform: isMobile ? `translate(${pan.x}px, ${pan.y}px)` : undefined,
-          display: "block",
-          // Center on desktop
-          margin: isMobile ? undefined : "auto",
-        }}
+        style={{ width: "100%", height: "100%", display: "block" }}
+        preserveAspectRatio="xMidYMid meet"
       >
         {/* Background */}
         <rect width={SVG_W} height={SVG_H} fill={BOARD_BG} />
 
         {/* Board border */}
-        <rect x={2} y={2} width={SVG_W - 4} height={SVG_H - 4} fill="none" stroke="#8B6914" strokeWidth={3} rx={4} />
+        <rect x={2} y={2} width={SVG_W-4} height={SVG_H-4} fill="none" stroke={BOARD_BORDER} strokeWidth={3} rx={6} />
 
-        {/* ─── Room images (drawn first as background) ─── */}
+        {/* ── Room images ── */}
         {Object.entries(ROOM_RECTS).map(([slug, [rs, re, cs, ce]]) => {
           const x = cs * CELL_PX;
           const y = rs * CELL_PX;
@@ -115,25 +82,33 @@ export function MapCanvas({ locations, players, reachable, onCellClick, isMobile
           const loc = slugToLoc.get(slug);
           return (
             <g key={slug}>
-              <rect x={x} y={y} width={w} height={h} fill="#2a1f0a" stroke="#8B6914" strokeWidth={1.5} />
+              <rect x={x} y={y} width={w} height={h} fill="#0d1117" stroke={BOARD_BORDER} strokeWidth={1.5} rx={3} />
               {loc?.imageUrl && (
                 <image
                   href={loc.imageUrl}
-                  x={x + 1} y={y + 1}
-                  width={w - 2} height={h - 2}
+                  x={x+1} y={y+1}
+                  width={w-2} height={h-2}
                   preserveAspectRatio="xMidYMid slice"
                 />
               )}
-              {/* Room overlay with name */}
-              <rect x={x} y={y + h - 20} width={w} height={20} fill="rgba(0,0,0,0.7)" />
+              {/* Gradient overlay at bottom for legibility */}
+              <defs>
+                <linearGradient id={`grad-${slug}`} x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="50%" stopColor="transparent" />
+                  <stop offset="100%" stopColor="rgba(0,0,0,0.85)" />
+                </linearGradient>
+              </defs>
+              <rect x={x} y={y} width={w} height={h} fill={`url(#grad-${slug})`} rx={3} />
+              {/* Name label */}
               <text
                 x={x + w / 2}
-                y={y + h - 7}
+                y={y + h - 8}
                 textAnchor="middle"
-                fontSize="8"
+                fontSize={Math.min(11, w / 7)}
                 fontFamily="monospace"
                 fontWeight="bold"
                 fill="#fff"
+                style={{ textShadow: "0 1px 4px #000" }}
               >
                 {loc?.name ?? slug}
               </text>
@@ -141,7 +116,7 @@ export function MapCanvas({ locations, players, reachable, onCellClick, isMobile
           );
         })}
 
-        {/* ─── Path and entry cells ─── */}
+        {/* ── Path & entry cells ── */}
         {BOARD_GRID.map((row, ri) =>
           row.map((code, ci) => {
             if (code === -1 || isRoomCell(code)) return null;
@@ -158,37 +133,32 @@ export function MapCanvas({ locations, players, reachable, onCellClick, isMobile
                 onClick={() => isReachable && onCellClick?.(ri, ci)}
                 style={{ cursor: isReachable ? "pointer" : "default" }}
               >
-                {/* Cell background */}
                 <rect
-                  x={x + 1} y={y + 1}
-                  width={CELL_PX - 2} height={CELL_PX - 2}
-                  rx={4} ry={4}
-                  fill={isReachable ? "#5aecb8" : isEntry ? ENTRY_COLOR : PATH_COLOR}
-                  stroke={isReachable ? "#00c88a" : PATH_STROKE}
+                  x={x+1} y={y+1}
+                  width={CELL_PX-2} height={CELL_PX-2}
+                  rx={5} ry={5}
+                  fill={isReachable ? REACH_FILL : isEntry ? ENTRY_BG : PATH_COLOR}
+                  stroke={isReachable ? REACH_STROKE : PATH_STROKE}
                   strokeWidth={isReachable ? 2 : 1}
                 />
-
-                {/* Pulse ring for reachable */}
                 {isReachable && (
                   <rect
-                    x={x + 1} y={y + 1}
-                    width={CELL_PX - 2} height={CELL_PX - 2}
-                    rx={4} ry={4}
+                    x={x+1} y={y+1}
+                    width={CELL_PX-2} height={CELL_PX-2}
+                    rx={5} ry={5}
                     fill="none"
-                    stroke="#00e5ff"
+                    stroke={REACH_STROKE}
                     strokeWidth={1.5}
-                    opacity={0.6}
+                    opacity={0.4}
                     className="animate-pulse"
                   />
                 )}
-
-                {/* Entry arrow */}
                 {isEntry && (
                   <ArrowPath
                     direction={ENTRY_DIRECTION[code] ?? "up"}
                     cx={x + CELL_PX / 2}
                     cy={y + CELL_PX / 2}
-                    size={10}
+                    size={CELL_PX * 0.35}
                   />
                 )}
               </g>
@@ -196,24 +166,22 @@ export function MapCanvas({ locations, players, reachable, onCellClick, isMobile
           })
         )}
 
-        {/* ─── Player tokens ─── */}
+        {/* ── Player tokens ── */}
         {players.map((p, idx) => {
           const cx = p.gridCol * CELL_PX + CELL_PX / 2;
           const cy = p.gridRow * CELL_PX + CELL_PX / 2;
           const color = PLAYER_COLORS[p.colorIndex % PLAYER_COLORS.length];
-          // Offset if multiple players on same cell
-          const offset = (idx % 2 === 0 ? 1 : -1) * (Math.floor(idx / 2) * 5);
+          // Stagger overlapping players
+          const ox = (idx % 3 - 1) * 6;
+          const oy = (Math.floor(idx / 3) - 0) * 6;
 
           return (
-            <g key={p.id} transform={`translate(${offset}, ${offset})`}>
-              {/* Glow ring for current player */}
+            <g key={p.id} transform={`translate(${ox},${oy})`}>
               {p.isMe && (
-                <circle cx={cx} cy={cy} r={13} fill="none" stroke={color} strokeWidth={2} opacity={0.5} className="animate-ping" />
+                <circle cx={cx} cy={cy} r={15} fill="none" stroke={color} strokeWidth={2.5} opacity={0.45} className="animate-ping" />
               )}
-              {/* Token circle */}
-              <circle cx={cx} cy={cy} r={11} fill={color} stroke="#0a0a0c" strokeWidth={2} />
-              {/* Player initial */}
-              <text x={cx} y={cy + 4} textAnchor="middle" fontSize="9" fontFamily="monospace" fontWeight="bold" fill="#000">
+              <circle cx={cx} cy={cy} r={13} fill={color} stroke={BOARD_BG} strokeWidth={2.5} />
+              <text x={cx} y={cy+4} textAnchor="middle" fontSize="11" fontFamily="monospace" fontWeight="bold" fill="#000">
                 {p.nickname.charAt(0).toUpperCase()}
               </text>
             </g>
